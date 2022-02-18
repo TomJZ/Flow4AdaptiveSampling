@@ -1,0 +1,109 @@
+from NODE.NODE import *
+
+import scipy.stats as st
+
+
+class Vortex_biconv_gaussian(ODEF):
+    def __init__(self):
+        super(Vortex_biconv_gaussian, self).__init__()
+        bias = True
+        self.enc_conv1 = nn.Conv2d(2, 32, kernel_size=3, stride=1, padding=0, bias=bias)
+        self.enc_conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=0, bias=bias)
+        self.enc_conv3 = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1, bias=bias)
+        self.enc_conv4 = nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1, bias=bias)
+        self.enc_conv5 = nn.Conv2d(128, 128, kernel_size=[5, 5], stride=2, padding=0, bias=bias)
+        self.enc_conv6 = nn.Conv2d(128, 128, kernel_size=[5, 5], stride=2, padding=0, bias=bias)
+        self.enc_conv7 = nn.Conv2d(128, 128, kernel_size=[2, 2], stride=2, padding=0, bias=bias)
+
+        # self.enc_bn1 = nn.BatchNorm2d(32)
+        # self.enc_bn2 = nn.BatchNorm2d(64)
+        # self.enc_bn3 = nn.BatchNorm2d(128)
+        # self.enc_bn4 = nn.BatchNorm2d(128)
+        # self.enc_bn5 = nn.BatchNorm2d(128)
+        # self.enc_bn6 = nn.BatchNorm2d(128)
+        # self.enc_bn7 = nn.BatchNorm2d(128)
+
+        self.lin1 = nn.Linear(128 * 4 * 2, 256, bias=bias)
+        self.lin2 = nn.Linear(256, 256, bias=bias)
+        self.lin3 = nn.Linear(256, 128, bias=bias)
+
+        self.dec_conv1 = nn.ConvTranspose2d(128, 128, kernel_size=[5, 3], stride=3, padding=0, output_padding=0,
+                                            bias=bias)
+        self.dec_conv2 = nn.ConvTranspose2d(128, 128, kernel_size=[7, 3], stride=3, padding=0, bias=bias)
+        self.dec_conv3 = nn.ConvTranspose2d(128, 128, kernel_size=[6, 6], stride=2, padding=0, output_padding=0,
+                                            bias=bias)
+        self.dec_conv4 = nn.ConvTranspose2d(128, 128, kernel_size=3, stride=1, padding=0, output_padding=0, bias=bias)
+        self.dec_conv5 = nn.ConvTranspose2d(128, 64, kernel_size=3, stride=1, padding=0, output_padding=0, bias=bias)
+        self.dec_conv6 = nn.ConvTranspose2d(64, 32, kernel_size=3, stride=1, padding=0, bias=bias)
+        self.dec_conv7 = nn.ConvTranspose2d(32, 2, kernel_size=3, stride=1, padding=0, bias=bias)
+
+        # self.dec_bn1 = nn.BatchNorm2d(128)
+        # self.dec_bn2 = nn.BatchNorm2d(128)
+        # self.dec_bn3 = nn.BatchNorm2d(128)
+        # self.dec_bn4 = nn.BatchNorm2d(128)
+        # self.dec_bn5 = nn.BatchNorm2d(64)
+        # self.dec_bn6 = nn.BatchNorm2d(32)
+
+        self.relu = nn.ReLU()
+        self.tanh = nn.Tanh()
+
+        # Create gaussian kernels
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.ker_size = 5
+        self.sigma = 0.1
+        self.kernel = Variable(Tensor(self.gkern(self.ker_size, self.sigma))).view(1, 1, self.ker_size,
+                                                                                   self.ker_size).to(device)
+
+    def gkern(self, kernlen=11, nsig=0.05):  # large nsig gives more freedom(pixels as agents), small nsig is more fluid
+        """Returns a 2D Gaussian kernel."""
+        x = np.linspace(-nsig, nsig, kernlen + 1)
+        kern1d = np.diff(st.norm.cdf(x))
+        kern2d = np.outer(kern1d, kern1d)
+        ker = kern2d / kern2d.sum()
+        return ker
+
+    def forward(self, x):
+        bs, *a = x.shape
+        # print("bs: ", bs)
+        x = x.view(bs, 2, 50, 30)
+        # print("x in", x.size())
+        x = self.relu(self.enc_conv1(x))
+        x = self.relu(self.enc_conv2(x))
+        x = self.relu(self.enc_conv3(x))
+        x = self.relu(self.enc_conv4(x))
+        x = self.relu(self.enc_conv5(x))
+        x = self.relu(self.enc_conv6(x))
+        x = self.relu(self.enc_conv7(x))
+        # print("after conv", x.size())
+
+        x = x.view(bs, -1)
+        x = self.relu(self.lin1(x))
+        x = self.relu(self.lin2(x))
+        x = self.lin3(x)
+
+        x = x.view(bs, 128, 1, 1)
+        x = self.relu(self.dec_conv1(x))
+        x = self.relu(self.dec_conv2(x))
+        x = self.relu(self.dec_conv3(x))
+        x = self.relu(self.dec_conv4(x))
+        x = self.relu(self.dec_conv5(x))
+        x = self.relu(self.dec_conv6(x))
+        x = self.dec_conv7(x)
+        # print("final", x.size())
+        x = x.view(bs, 2, 50, 30)
+        imgx = 50
+        imgy = 30
+        # Apply smoothing
+        x_smooth_x = F.conv2d(x[:, 0, :, :].squeeze().view(bs, 1, imgx, imgy), self.kernel,
+                              padding=int((self.ker_size - 1) / 2), ).view(bs, 1, imgx, imgy)
+        x_smooth_x = F.conv2d(x_smooth_x.squeeze().view(bs, 1, imgx, imgy), self.kernel,
+                              padding=int((self.ker_size - 1) / 2), ).view(bs, 1, imgx, imgy)
+
+        x_smooth_y = F.conv2d(x[:, 1, :, :].squeeze().view(bs, 1, imgx, imgy), self.kernel,
+                              padding=int((self.ker_size - 1) / 2)).view(bs, 1, imgx, imgy)
+        x_smooth_y = F.conv2d(x_smooth_y.squeeze().view(bs, 1, imgx, imgy), self.kernel,
+                              padding=int((self.ker_size - 1) / 2), ).view(bs, 1, imgx, imgy)
+
+        x_smooth = torch.cat([x_smooth_x, x_smooth_y], 1)
+
+        return x_smooth
