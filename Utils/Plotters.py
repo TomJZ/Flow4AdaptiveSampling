@@ -100,3 +100,16 @@ def make_flow_anim(X, Y, V, t0, tN, save=False, title=''):
         anim.save(title + '.mp4', writer=animation.FFMpegWriter(fps=12))
 
     return anim
+
+
+def plot_regular_mesh(X_reg, Y_reg, V_x_reg):
+    """
+    plotting the regularized mesh
+    """
+    fig, ax = plt.subplots(figsize=(7, 3.5), nrows=1)
+    ax = plt.axes()
+    ax.set(xlim=(2.2, 17.5), ylim=(-4.5, 4.5))
+    c = ax.pcolor(X_reg, Y_reg, V_x_reg, cmap="RdBu_r")
+    ax.set_title('vortex shedding on regular grid')
+    fig.tight_layout()
+    plt.show()

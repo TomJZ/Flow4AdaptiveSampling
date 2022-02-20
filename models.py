@@ -1,5 +1,5 @@
 from NODE.NODE import *
-
+from torch.nn  import functional as F
 import scipy.stats as st
 
 

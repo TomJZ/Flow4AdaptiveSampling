@@ -1,13 +1,19 @@
 import numpy as np
 from tqdm import tqdm
 import pandas as pd
+from scipy.interpolate import griddata
 
 
-# Getting Data for animation
-# "/content/drive/Shared drives/ScalAR Lab/MchnLrng_DynSys/data/Wake_Behind_Cylinder/OpenFoamData/Re200_WithTurbulence"
 def read_vortex_data(start_idx, end_idx, path):
-    start_idx = 200
-    end_idx = 384
+    """
+    Args:
+        start_idx: int, the time index to start reading from
+        end_idx: int, the time index to end reading
+        path: the file path, except for the number and file extension
+
+    Returns:
+
+    """
     vortex_df = []
     X = []
     Y = []
@@ -47,3 +53,54 @@ def read_vortex_data(start_idx, end_idx, path):
     print("V_y size:\n", V_y.shape)
     print("V_z size:\n", V_z.shape)
     return X, Y, V_x, V_y, V_z, P
+
+
+def regularize_grid(X, Y, V_x):
+    """
+      Regularize an irregular grid by interpolation
+      Input:
+        X: simulation grid X coordinate values
+        Y: simulation grid Y coordinate values
+        V_x: the data to be regularized
+      Return:
+        grid_x: regularized X coordinates
+        grid_y: regularized Y coordinates
+        V_x_regular: regularized data
+    """
+    grid_x, grid_y = np.mgrid[2:18:54j, -5:5:32j]
+    irregular_coor = np.concatenate([X.reshape([-1, 1]), Y.reshape(-1, 1)], 1)
+    values = V_x
+    V_x_regular = griddata(irregular_coor, values, (grid_x, grid_y), method='linear')
+    return grid_x, grid_y, V_x_regular
+
+
+def regularize_flow_data(X, Y, V_x, V_y):
+    data_len = len(V_x)
+    # creating regularized data
+    V_x_reg = []
+    V_y_reg = []
+    X_list = []
+    Y_list = []
+
+    print("Regularizing Grid...")
+    for snapshot_t in tqdm(range(data_len - 1)):  # only taking the 200th to the 250th step data
+        X_reg, Y_reg, curr_V_x = regularize_grid(X, Y, V_x[snapshot_t])
+        X_reg, Y_reg, curr_V_y = regularize_grid(X, Y, V_y[snapshot_t])
+        V_x_reg.append(curr_V_x)
+        V_y_reg.append(curr_V_y)
+        X_list.append(X_reg)
+        Y_list.append(Y_reg)
+
+    V_x_reg = np.array(V_x_reg)
+    V_y_reg = np.array(V_y_reg)
+    X_reg = np.array(X_list)
+    Y_reg = np.array(Y_list)
+
+    # remove uninterpolated borders
+    # chopping away uninterpolated points (i.e. remove the borders)
+    V_x_reg = V_x_reg[:, 2:-2, 1:-1]
+    X_reg = X_reg[:, 2:-2, 1:-1]
+    V_y_reg = V_y_reg[:, 2:-2, 1:-1]
+    Y_reg = Y_reg[:, 2:-2, 1:-1]
+
+    return V_x_reg, V_y_reg, X_reg, Y_reg

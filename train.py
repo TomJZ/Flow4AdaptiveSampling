@@ -1,12 +1,16 @@
-import
+from torch.nn  import functional as F
+from Utils.Plotters import *
+import torch
 
-def sample_and_grow_PDE(ode_train, true_sampled_traj, true_sampled_times, epochs, lookahead, plot_freq=300):
+def sample_and_grow_PDE(ode_train, true_sampled_traj, true_sampled_times, epochs, lookahead, ITER_OFFSET, LR,
+                        save_path, plot_freq=300):
     optimizer = torch.optim.Adam(ode_train.parameters(), lr=LR)
     n_segments = len(true_sampled_traj)
     obs_list = []
     for i in range(len(true_sampled_traj) - lookahead):
         obs_list.append(true_sampled_traj[i:i + lookahead].unsqueeze(1))
     obs_ = torch.cat(obs_list, 1).squeeze()
+    loss_arr = []
 
     for i in range(epochs):
         # Train Neural ODE
@@ -35,4 +39,3 @@ def sample_and_grow_PDE(ode_train, true_sampled_traj, true_sampled_times, epochs
             make_color_map(z_p[:, :, :, :].cpu().detach().numpy().reshape([TRAIN_LEN, -1]),
                            "Training NN for Vortex\n" + updated_title,
                            slice=False, save=save_path + name + f"_color_{i + ITER_OFFSET}.png", figure_size=(10, 10))
-            clear_output(wait=True)
