@@ -5,8 +5,8 @@ import numpy as np
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     start_idx = 0
-    end_idx = 385
-    path = "Data/Re200_WithTurbulence/Re200_Lam_wTurbulence_"
+    end_idx = 384
+    path = "Data/Re200_NoTurbulence/Re200_Lam_NoTurb_"
     X, Y, V_x, V_y, V_z, P = read_vortex_data(start_idx, end_idx, path)
 
     # SAVE_PLOT = None
@@ -28,5 +28,5 @@ if __name__ == '__main__':
 
     # training data
     training_data = np.stack([V_x_reg, V_y_reg], 1)
-    with open("Data/Processed/vortex_re200_with_turbulence.npy", 'wb') as f:
+    with open("Data/Processed/vortex_re200_no_turbulence.npy", 'wb') as f:
         np.save(f, training_data)

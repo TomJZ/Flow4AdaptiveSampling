@@ -1,11 +1,12 @@
 from NODE.NODE import *
-from torch.nn  import functional as F
+from torch.autograd import Variable
+from torch.nn import functional as F
 import scipy.stats as st
 
 
-class Vortex_biconv_gaussian(ODEF):
+class VortexBiconvGaussian(ODEF):
     def __init__(self):
-        super(Vortex_biconv_gaussian, self).__init__()
+        super(VortexBiconvGaussian, self).__init__()
         bias = True
         self.enc_conv1 = nn.Conv2d(2, 32, kernel_size=3, stride=1, padding=0, bias=bias)
         self.enc_conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=0, bias=bias)
@@ -52,7 +53,7 @@ class Vortex_biconv_gaussian(ODEF):
         self.ker_size = 5
         self.sigma = 0.1
         self.kernel = Variable(Tensor(self.gkern(self.ker_size, self.sigma))).view(1, 1, self.ker_size,
-                                                                                   self.ker_size).to(device)
+                                                                                   self.ker_size).to(device).double()
 
     def gkern(self, kernlen=11, nsig=0.05):  # large nsig gives more freedom(pixels as agents), small nsig is more fluid
         """Returns a 2D Gaussian kernel."""
@@ -63,10 +64,12 @@ class Vortex_biconv_gaussian(ODEF):
         return ker
 
     def forward(self, x):
-        bs, *a = x.shape
+        bs, nc, imgx, imgy = x.shape
+        # print("x shape: ", x.shape)
         # print("bs: ", bs)
-        x = x.view(bs, 2, 50, 30)
+        x = x.view(bs, nc, imgx, imgy)
         # print("x in", x.size())
+        # print(x)
         x = self.relu(self.enc_conv1(x))
         x = self.relu(self.enc_conv2(x))
         x = self.relu(self.enc_conv3(x))
@@ -90,9 +93,76 @@ class Vortex_biconv_gaussian(ODEF):
         x = self.relu(self.dec_conv6(x))
         x = self.dec_conv7(x)
         # print("final", x.size())
-        x = x.view(bs, 2, 50, 30)
-        imgx = 50
-        imgy = 30
+        x = x.view(bs, nc, imgx, imgy)
+        # Apply smoothing
+        x_smooth_x = F.conv2d(x[:, 0, :, :].squeeze().view(bs, 1, imgx, imgy), self.kernel,
+                              padding=int((self.ker_size - 1) / 2), ).view(bs, 1, imgx, imgy)
+        x_smooth_x = F.conv2d(x_smooth_x.squeeze().view(bs, 1, imgx, imgy), self.kernel,
+                              padding=int((self.ker_size - 1) / 2), ).view(bs, 1, imgx, imgy)
+
+        x_smooth_y = F.conv2d(x[:, 1, :, :].squeeze().view(bs, 1, imgx, imgy), self.kernel,
+                              padding=int((self.ker_size - 1) / 2)).view(bs, 1, imgx, imgy)
+        x_smooth_y = F.conv2d(x_smooth_y.squeeze().view(bs, 1, imgx, imgy), self.kernel,
+                              padding=int((self.ker_size - 1) / 2), ).view(bs, 1, imgx, imgy)
+
+        x_smooth = torch.cat([x_smooth_x, x_smooth_y], 1)
+
+        return x_smooth
+
+
+class VortexConvGaussian(ODEF):
+    def __init__(self):
+        super(VortexConvGaussian, self).__init__()
+        bias = True
+        self.enc_conv1 = nn.Conv2d(2, 32, kernel_size=3, stride=1, padding=0, bias=bias)
+        self.enc_conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=0, bias=bias)
+        self.enc_conv3 = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1, bias=bias)
+        self.enc_conv4 = nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1, bias=bias)
+        self.enc_conv5 = nn.Conv2d(128, 128, kernel_size=3, stride=2, padding=0, bias=bias)
+        self.enc_conv6 = nn.Conv2d(128, 128, kernel_size=3, stride=2, padding=0, bias=bias)
+        self.enc_conv7 = nn.Conv2d(128, 128, kernel_size=3, stride=2, padding=0, bias=bias)
+
+        self.lin1 = nn.Linear(128 * 4 * 2, 128, bias=bias)
+        self.lin2 = nn.Linear(128, 256, bias=bias)
+        self.lin3 = nn.Linear(256, 2 * 50 * 30, bias=bias)
+
+        self.relu = nn.Tanh()
+
+        # Create gaussian kernels
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.ker_size = 5
+        self.sigma = 0.1
+        self.kernel = Variable(Tensor(self.gkern(self.ker_size, self.sigma))).view(1, 1, self.ker_size,
+                                                                                   self.ker_size).to(device).double()
+
+    def gkern(self, kernlen=11, nsig=0.05):  # large nsig gives more freedom(pixels as agents), small nsig is more fluid
+        """Returns a 2D Gaussian kernel."""
+        x = np.linspace(-nsig, nsig, kernlen + 1)
+        kern1d = np.diff(st.norm.cdf(x))
+        kern2d = np.outer(kern1d, kern1d)
+        ker = kern2d / kern2d.sum()
+        return ker
+
+    def forward(self, x):
+        bs, nc, imgx, imgy = x.shape
+        # print("bs: ", bs)
+        x = x.view(bs, nc, imgx, imgy)
+        # print("x in", x.size())
+        x = self.relu(self.enc_conv1(x))
+        x = self.relu(self.enc_conv2(x))
+        x = self.relu(self.enc_conv3(x))
+        x = self.relu(self.enc_conv4(x))
+        x = self.relu(self.enc_conv5(x))
+        x = self.relu(self.enc_conv6(x))
+        x = self.relu(self.enc_conv7(x))
+        # print("after conv", x.size())
+
+        x = x.view(bs, -1)
+        x = self.relu(self.lin1(x))
+        x = self.relu(self.lin2(x))
+        x = self.lin3(x)
+
+        x = x.view(bs, nc, imgx, imgy)
         # Apply smoothing
         x_smooth_x = F.conv2d(x[:, 0, :, :].squeeze().view(bs, 1, imgx, imgy), self.kernel,
                               padding=int((self.ker_size - 1) / 2), ).view(bs, 1, imgx, imgy)

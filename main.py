@@ -1,58 +1,54 @@
-from Utils.GetData import *
 from Utils.Plotters import *
 from Utils.Solvers import *
-from NODE.NODE import *
 from models import *
+from train import *
 import torch
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    start_idx = 200
-    end_idx = 385
-    path = "Data/Re200_WithTurbulence/Re200_Lam_wTurbulence_"
-    X, Y, V_x, V_y, V_z, P = read_vortex_data(start_idx, end_idx, path)
-
-    # SAVE_PLOT = None
-    # tn = 180  # the nth snapshot, for plotting (verifying purpose only)
-    # plot_vortex(X, Y, V_x, tn=tn, save=SAVE_PLOT)
-    #
-    # SAVE_ANIM = True
-    # t0 = 0  # the first frame to start animating
-    # tN = 100  # the last frame to stop animating
-    # anim = make_flow_anim(X, Y, V_x, t0=t0, tN=tN, save=SAVE_ANIM, title="VortexShedding_Re40_Laminar")
+    """
+    Load Training Data
+    """
+    training_data = np.load("Data/Processed/vortex_re200_no_turbulence.npy")
+    all_len, nc, x_size, y_size = training_data.shape
+    print("All data shape is: ", training_data.shape)
 
     """
-    Making Training Data
+    Training parameters
     """
-    # regularize the grid
-    V_x_reg, V_y_reg, _, _ = regularize_flow_data(X, Y, V_x, V_y)
-    plt.imshow(V_x_reg[0].T, interpolation=None, cmap=plt.cm.get_cmap('RdBu_r'), alpha=1)
-    plt.show()
-
-    # training data
-    training_data = np.stack([V_x_reg, V_y_reg], 1)
-
-    """
-    Training
-    """
-    Hybrid = False
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     ode_solve = Euler
     step_size = 0.01
     loss_arr = []  # initializing loss array
-    ode_train = NeuralODE(Vortex_biconv_gaussian())
-    n_grid = 1500
+    # initialize NODE model
+    ode_train = NeuralODE(VortexConvGaussian().to(device), ode_solve, step_size).double().to(device)
+    n_grid = x_size * y_size  # grid size
     vortex_train = training_data
-    train_len = 50
-    obs_notime = torch.tensor(vortex_train).view(train_len, 2, 50, 30)
-    obs = obs_notime
+    epochs = 40
+    lookahead = 2
+    iter_offset = 0
+    lr = 0.01
+    save_path = None
+    train_start_idx = 200  # the index from which training data takes from all data
+    train_len = 10  # length of training data
+    step_skip = 4  # number of steps per time interval
+    obs = torch.tensor(vortex_train[train_start_idx:train_start_idx + train_len]).view(train_len, 2, 50,
+                                                                                       30).double().to(device)
+    obs_t = step_skip * torch.tensor((np.arange(len(obs))).astype(int))
     NOISE_VAR = 0.0  # Variance of gaussian noise added to the observation. Assumed to be 0-mean
     obs[:, :, :, 0:2] = obs[:, :, :, 0:2] + torch.randn_like(obs[:, :, :, 0:2]) * NOISE_VAR
-
-    print("observation size\n", obs.size())
-    z_p = ode_train(obs[0], 4 * torch.tensor((np.arange(len(obs))).astype(int)), return_whole_sequence=True)
+    print("Training data shape is: \n", obs.shape)
+    # run the model once
+    z_p = ode_train(obs[0].unsqueeze(0), obs_t,
+                    return_whole_sequence=True)
     print("z_p size\n", z_p.size())
 
-    make_color_map(z_p[:, :, :, :].detach().numpy().reshape([train_len, -1]), "Training ConvNN for KS\n",
-                   slice=False, save=None, figure_size=(8, 3))
-    make_color_map(obs[:, :, :, :].detach().numpy().reshape([train_len, -1]), "Training ConvNN for KS\n",
-                   slice=False, save=None, figure_size=(8, 3))
+    # make_color_map(z_p[:, :, :, :].detach().numpy().reshape([train_len, -1]), "Training ConvNN for KS\n",
+    #                slice=False, save=None, figure_size=(8, 3))
+    # make_color_map(obs[:, :, :, :].detach().numpy().reshape([train_len, -1]), "Training ConvNN for KS\n",
+    #                slice=False, save=None, figure_size=(8, 3))
+    #
+    # plt.show()
+
+    sample_and_grow_PDE(ode_train, obs, obs_t, epochs, lookahead, iter_offset, lr,
+                        save_path, plot_freq=20)

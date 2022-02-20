@@ -27,7 +27,6 @@ def make_color_map(DATA_TO_PLOT, title="Untitled", slice=False, save=None, figur
     fig.colorbar(c)
     if save is not None:
         plt.savefig(save)
-    plt.show()
 
     if slice:
         # plotting one single trajectory
@@ -41,7 +40,6 @@ def make_color_map(DATA_TO_PLOT, title="Untitled", slice=False, save=None, figur
         ax.set_xlabel('time')
         ax.set_ylabel('state')
         fig.tight_layout()
-        plt.show()
 
 
 def plot_vortex(X, Y, V, tn, save=None, scatter_coor=None):
