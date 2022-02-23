@@ -32,7 +32,7 @@ def sample_and_grow_PDE(ode_train, true_sampled_traj, true_sampled_times, epochs
                 i + ITER_OFFSET, loss.item(), len(true_sampled_traj), lookahead - 1, LR)
             print(updated_title)
             if save_path is not None:
-                CHECKPOINT_PATH = save_path + "/vortex_conv_gaussian.pth"
+                CHECKPOINT_PATH = save_path + ".pth"
                 torch.save({'ode_train': ode_train, 'loss_arr': loss_arr}, CHECKPOINT_PATH)
                 img_save_path = save_path + f"_color_{i + ITER_OFFSET}.png"
             else:

@@ -22,20 +22,21 @@ if __name__ == '__main__':
     loss_arr = []  # initializing loss array
     # initialize NODE model
     ode_train = NeuralODE(VortexConvGaussian().to(device), ode_solve, step_size).double().to(device)
+    # ode_train = torch.load("SavedModels/vortex_conv_gaussian_noTurb.pth")['ode_train']
     n_grid = x_size * y_size  # grid size
     vortex_train = training_data
-    epochs = 2000
+    epochs = 1300
     lookahead = 2
     iter_offset = 0
     lr = 0.001
-    save_path = "SavedModels/"
+    save_path = "SavedModels/vortex_conv_gaussian_noTurb"  # file extenssion will be added in training loop
     train_start_idx = 200  # the index from which training data takes from all data
     train_len = 50  # length of training data
-    step_skip = 5  # number of steps per time interval
+    step_skip = 6  # number of steps per time interval
     obs = torch.tensor(vortex_train[train_start_idx:train_start_idx + train_len]).view(train_len, 2, 50,
                                                                                        30).double().to(device)
     obs_t = step_skip * torch.tensor((np.arange(len(obs))).astype(int))
-    NOISE_VAR = 0.0  # Variance of gaussian noise added to the observation. Assumed to be 0-mean
+    NOISE_VAR = 0.001  # Variance of gaussian noise added to the observation. Assumed to be 0-mean
     obs[:, :, :, 0:2] = obs[:, :, :, 0:2] + torch.randn_like(obs[:, :, :, 0:2]) * NOISE_VAR
     print("Training data shape is: \n", obs.shape)
     # run the model once
