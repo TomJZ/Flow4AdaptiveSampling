@@ -26,28 +26,36 @@ if __name__ == '__main__':
     """
     Loading pre-processed training data from npy
     """
-    processed_data = np.load("Data/Processed/vortex_re200_no_turbulence.npy")
-    V_x = processed_data[:, 0, :, :].reshape(383, -1)
-    V_y = processed_data[:, 1, :, :]
-    processed_data2 = np.load("Data/Processed/vortex_re200_with_turbulence.npy")
-    V_x2 = processed_data2[:, 0, :, :].reshape(383, -1)
-    V_y2 = processed_data2[:, 1, :, :]
+    vortex_noTurb = np.load("Data/Processed/vortex_re200_no_turbulence.npy")
+    vortex_V_x = vortex_noTurb[:, 0, :, :].reshape(383, -1)
+    vortex_V_y = vortex_noTurb[:, 1, :, :]
+    vortex_withTurb = np.load("Data/Processed/vortex_re200_with_turbulence.npy")
+    vortex_V_x2 = vortex_withTurb[:, 0, :, :].reshape(383, -1)
+    vortex_V_y2 = vortex_withTurb[:, 1, :, :]
+    diff = vortex_V_x - vortex_V_x2
+    vortex_grid = np.load("Data/Processed/vortex_regularized_grid.npy")
+    vortex_X = vortex_grid[0, 0, :, :].reshape(-1)
+    vortex_Y = vortex_grid[1, 0, :, :].reshape(-1)
 
-    diff = V_x-V_x2
-    grid = np.load("Data/Processed/regularized_grid.npy")
-    X = grid[0, 0, :, :].reshape(-1)
-    Y = grid[1, 0, :, :].reshape(-1)
+    dg_flow_field = np.load("Data/Processed/dg_flow_field.npy")
+    dg_U = dg_flow_field[:, 0, :, :].reshape(200, -1)
+    dg_V = dg_flow_field[:, 1, :, :].reshape(200, -1)
+    dg_grid = np.load("Data/Processed/dg_grid.npy")
+    dg_X = dg_grid[0].reshape(-1)
+    dg_Y = dg_grid[1].reshape(-1)
 
     """
     Generating animation
     """
-    anim_data = diff
+    anim_data = dg_U
+    X = dg_X
+    Y = dg_Y
     SAVE_ANIM = True
-    t0 = 100  # the first frame to start animating
-    tN = 200  # the last frame to stop animating
+    t0 = 50  # the first frame to start animating
+    tN = 199  # the last frame to stop animating
     anim = make_flow_anim(X, Y, anim_data, t0=t0, tN=tN,
                           save=SAVE_ANIM,
-                          title="Data/Video/turb_noturb_diff2")
+                          title="Data/Video/dg_flow_field")
 
     # # save training data
     # training_data = np.stack([V_x_reg, V_y_reg], 1)
@@ -55,6 +63,5 @@ if __name__ == '__main__':
     #     np.save(f, training_data)
     # print(X_reg.shape)
     # regularized_grid = np.stack([X_reg, Y_reg])
-    # with open("Data/Processed/regularized_grid.npy", 'wb') as f:
+    # with open("Data/Processed/vortex_regularized_grid.npy", 'wb') as f:
     #     np.save(f, regularized_grid)
-

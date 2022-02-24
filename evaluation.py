@@ -14,7 +14,7 @@ if __name__ == "__main__":
     """
     snapshot = 300  # the snapshot to use as initial condition
     processed_data = np.load("Data/Processed/vortex_re200_no_turbulence.npy")
-    grid = np.load("Data/Processed/regularized_grid.npy")
+    grid = np.load("Data/Processed/vortex_regularized_grid.npy")
     X = grid[0, 0, :, :]
     Y = grid[1, 0, :, :]
     initial_condition = torch.tensor(processed_data[snapshot]).unsqueeze(0)
