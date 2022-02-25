@@ -6,17 +6,17 @@ if __name__ == "__main__":
     """
     load pretrained model
     """
-    ode_train = torch.load("SavedModels/vortex_conv_gaussian_withTurb.pth",
+    ode_train = torch.load("SavedModels/vortex_conv_gaussian_oscillating.pth",
                            map_location=torch.device('cpu'))['ode_train']
 
     """
     Load initial condition from data 
     """
-    snapshot = 250  # the snapshot to use as initial condition
-    processed_data = np.load("Data/Processed/vortex_re200_with_turbulence.npy")
+    snapshot = 200  # the snapshot to use as initial condition
+    processed_data = np.load("Data/Processed/vortex_re200_oscillating.npy")
     grid = np.load("Data/Processed/vortex_regularized_grid.npy")
-    X = grid[0, 0, :, :]
-    Y = grid[1, 0, :, :]
+    X = grid[0, :, :]
+    Y = grid[1, :, :]
     initial_condition = torch.tensor(processed_data[snapshot]).unsqueeze(0)
     print("Initial condition has shape: ", initial_condition.shape)
 
@@ -47,10 +47,10 @@ if __name__ == "__main__":
     t0 = 0
     tN = t0 + test_len
 
-    anim = make_flow_anim(X.reshape(-1), Y.reshape(-1), pred_mag.reshape(test_len, -1), t0=t0, tN=tN,
-                          save=SAVE_ANIM,
-                          title="Data/Video/prediction_withTurb_mag")
+    anim = make_flow_anim(X.reshape(-1), Y.reshape(-1), V_x.reshape(test_len, -1), t0=t0, tN=tN,
+                          save_path="Data/Video/prediction_oscillating_Vx_on_training_data",
+                          title="training prediction oscillating")
 
     print("pred mag shape is: ", pred_mag.shape)
-    with open("Data/Processed/prediction_mag_withTurb.npy", 'wb') as f:
+    with open("Data/Processed/prediction_oscillating_Vx.npy", 'wb') as f:
          np.save(f, pred_mag)

@@ -191,9 +191,9 @@ class DGConvGaussian(ODEF):
         self.enc_conv6 = nn.Conv2d(128, 128, kernel_size=3, stride=2, padding=0, bias=bias)
         self.enc_conv7 = nn.Conv2d(128, 128, kernel_size=3, stride=2, padding=0, bias=bias)
 
-        self.lin1 = nn.Linear(128 * 4 * 2, 128, bias=bias)
+        self.lin1 = nn.Linear(1792, 128, bias=bias)
         self.lin2 = nn.Linear(128, 256, bias=bias)
-        self.lin3 = nn.Linear(256, 2 * 50 * 30, bias=bias)
+        self.lin3 = nn.Linear(256, 2 * 34 * 67, bias=bias)
 
         self.relu = nn.Tanh()
 
