@@ -6,14 +6,14 @@ if __name__ == "__main__":
     """
     load pretrained model
     """
-    ode_train = torch.load("SavedModels/vortex_conv_gaussian_noTurb.pth",
+    ode_train = torch.load("SavedModels/vortex_conv_gaussian_withTurb.pth",
                            map_location=torch.device('cpu'))['ode_train']
 
     """
     Load initial condition from data 
     """
-    snapshot = 300  # the snapshot to use as initial condition
-    processed_data = np.load("Data/Processed/vortex_re200_no_turbulence.npy")
+    snapshot = 250  # the snapshot to use as initial condition
+    processed_data = np.load("Data/Processed/vortex_re200_with_turbulence.npy")
     grid = np.load("Data/Processed/vortex_regularized_grid.npy")
     X = grid[0, 0, :, :]
     Y = grid[1, 0, :, :]
@@ -37,6 +37,7 @@ if __name__ == "__main__":
     # predicted V_x and V_y
     V_x = pred[:, 0, :, :]
     V_y = pred[:, 1, :, :]
+    pred_mag = np.sqrt(V_x ** 2 + V_y ** 2)
 
     """
     Animating Predictions
@@ -46,6 +47,10 @@ if __name__ == "__main__":
     t0 = 0
     tN = t0 + test_len
 
-    anim = make_flow_anim(X.reshape(-1), Y.reshape(-1), V_x.reshape(test_len, -1), t0=t0, tN=tN,
+    anim = make_flow_anim(X.reshape(-1), Y.reshape(-1), pred_mag.reshape(test_len, -1), t0=t0, tN=tN,
                           save=SAVE_ANIM,
-                          title="Data/Video/prediction_noTurb")
+                          title="Data/Video/prediction_withTurb_mag")
+
+    print("pred mag shape is: ", pred_mag.shape)
+    with open("Data/Processed/prediction_mag_withTurb.npy", 'wb') as f:
+         np.save(f, pred_mag)

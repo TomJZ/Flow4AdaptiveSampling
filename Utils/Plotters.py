@@ -72,7 +72,7 @@ def plot_vortex(X, Y, V, tn, save=None, scatter_coor=None):
     plt.show()
 
 
-def make_flow_anim(X, Y, V, t0, tN, save=False, title=''):
+def make_flow_anim(X, Y, V, t0, tN, save_path='', title=''):
     fig = plt.figure(figsize=(7, 3.7))
     ax = fig.add_subplot(1, 1, 1)
     ax.set_facecolor('black')
@@ -80,7 +80,7 @@ def make_flow_anim(X, Y, V, t0, tN, save=False, title=''):
     c = ax.tricontourf(X[:], Y[:], V[t0], levels=n_levels, cmap="RdBu_r")
     cb = fig.colorbar(c, ax=ax)
     tick_locator = ticker.MaxNLocator(nbins=6)
-    ax.set_title('Vortex Shedding Vx')
+    ax.set_title(title)
     # ax.set(xlim=(-1.5, 17.5), ylim=(-4.5, 4.5))
     fig.tight_layout()
     rcParams['animation.embed_limit'] = 2 ** 128
@@ -89,13 +89,16 @@ def make_flow_anim(X, Y, V, t0, tN, save=False, title=''):
     for i in range(t0, tN, 1):
         if i % 10 == 0:
             print("Animating frame: ", i)
+        print("inf check ", np.where(np.isinf(V[i])==True))
+        print("nan check ", np.where(np.isnan(V[i]) == True))
+        V[i][np.where(np.isnan(V[i]) == True)] = 0
         c = ax.tricontourf(X[:], Y[:], V[i], levels=n_levels, cmap="RdBu_r")
         img_list.append(c.collections)
 
     anim = animation.ArtistAnimation(fig, img_list, interval=50)
 
-    if save:
-        anim.save(title + '.mp4', writer=animation.FFMpegWriter(fps=12))
+    if save_path is not None:
+        anim.save(save_path + '.mp4', writer=animation.FFMpegWriter(fps=12))
 
     return anim
 

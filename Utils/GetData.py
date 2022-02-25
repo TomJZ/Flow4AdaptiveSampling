@@ -104,3 +104,51 @@ def regularize_flow_data(X, Y, V_x, V_y):
     Y_reg = Y_reg[:, 2:-2, 1:-1]
 
     return V_x_reg, V_y_reg, X_reg, Y_reg
+
+
+def get_oscillating_cylinder_data(start_idx, end_idx, path):
+    """
+    Args:
+        start_idx: int, the time index to start reading from
+        end_idx: int, the time index to end reading
+        path: the file path, except for the number and file extension
+
+    Returns:
+
+    """
+    vortex_df = []
+    X = []
+    Y = []
+    V_x = []
+    V_y = []
+    V_z = []
+    P = []
+
+    print("Reading Data...")
+    for i in tqdm(range(start_idx, end_idx)):
+        df = pd.read_csv(path + format(i, '03d') + ".csv")
+
+        x = np.array(df['Points:0'])
+        y = np.array(df['Points:1'])
+        v_x = np.array(df['U:0'])
+        v_y = np.array(df['U:1'])
+        index = np.logical_and(np.logical_and(np.logical_and(x > -1.5, y < 5), y > -5), x < 18)
+
+        x_reg, y_reg, v_x_reg = regularize_grid(x[index], y[index], v_x[index])
+        x_reg, y_reg, v_y_reg = regularize_grid(x[index], y[index], v_y[index])
+
+        X.append(x_reg[2:-2, 1:-1])
+        Y.append(y_reg[2:-2, 1:-1])
+        V_x.append(v_x_reg[2:-2, 1:-1])
+        V_y.append(v_y_reg[2:-2, 1:-1])
+
+    X = np.array(X)[0]
+    Y = np.array(Y)[0]
+    V_x = np.array(V_x)
+    V_y = np.array(V_y)
+
+    print("X grid size:\n", X.shape)
+    print("Y grid size:\n", Y.shape)
+    print("V_x size:\n", V_x.shape)
+    print("V_y size:\n", V_y.shape)
+    return X, Y, V_x, V_y
