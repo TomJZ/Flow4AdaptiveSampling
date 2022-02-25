@@ -47,27 +47,27 @@ if __name__ == '__main__':
     # dg_X = dg_grid[0].reshape(-1)
     # dg_Y = dg_grid[1].reshape(-1)
     #
-    """
-    Generating animation
-    """
-    anim_data = V_x_reg
-    X = vortex_X
-    Y = vortex_Y
-    save_path = "Data/Video/vortex_oscillating"
-    t0 = 0  # the first frame to start animating
-    tN = 399  # the last frame to stop animating
-    anim = make_flow_anim(X.reshape(-1), Y.reshape(-1), anim_data.reshape(tN-t0, -1), t0=t0, tN=tN,
-                          save_path=save_path,
-                          title="vortex oscillating Vx")
+    # """
+    # Generating animation
+    # """
+    # anim_data = V_x_reg
+    # X = vortex_X
+    # Y = vortex_Y
+    # save_path = "Data/Video/vortex_oscillating"
+    # t0 = 0  # the first frame to start animating
+    # tN = 399  # the last frame to stop animating
+    # anim = make_flow_anim(X.reshape(-1), Y.reshape(-1), anim_data.reshape(tN-t0, -1), t0=t0, tN=tN,
+    #                       save_path=save_path,
+    #                       title="vortex oscillating Vx")
 
     # # save training data
     # regularized_grid = np.stack([X_reg, Y_reg])
     # print("grid shape: ", regularized_grid.shape)
     # with open("Data/Processed/vortex_regularized_grid.npy", 'wb') as f:
     #     np.save(f, regularized_grid)
-    # training_data = np.stack([V_x_reg, V_y_reg], 1)
-    # with open("Data/Processed/vortex_re200_oscillating.npy", 'wb') as f:
-    #     np.save(f, training_data)
-    # print(mag.shape)
+    training_data = np.stack([V_x_reg, V_y_reg], 1)
+    with open("Data/Processed/vortex_re200_oscillating.npy", 'wb') as f:
+        np.save(f, training_data)
+
     # with open("Data/Processed/training_mag_withTurb.npy", 'wb') as f:
     #      np.save(f, mag.reshape(383, 50, 30))
