@@ -1,5 +1,6 @@
 import time
 from Utils.Plotters import *
+from Utils.POD import *
 from NODE.NODE import *
 
 if __name__ == "__main__":
@@ -12,6 +13,10 @@ if __name__ == "__main__":
     step_skip = 6  # number of steps within one time interval
     anim_save_path = "Data/Video/prediction_dg_square_on_testing_data"
     anim_title = "testing prediction dg square"
+    pred_save_path = "Data/Predictions/test.npy"
+    generate_animation = False  # whether to generate animation and save
+    generate_POD = True  # whether to compute POD energies
+    save_prediction = False  # whether to save predicted trajectories
 
     if flow == 'dg':
         data_shrink_scale = 2
@@ -55,20 +60,33 @@ if __name__ == "__main__":
     # predicted V_x and V_y
     V_x = pred[:, 0, :, :]
     V_y = pred[:, 1, :, :]
-    pred_mag = np.sqrt(V_x ** 2 + V_y ** 2)
+    mag = np.sqrt(V_x ** 2 + V_y ** 2)
 
     """
     Animating Predictions
     """
-    SAVE_ANIM = True
-    SAVE_PLOT = None
-    t0 = 0
-    tN = t0 + test_len
+    if generate_animation:
+        SAVE_ANIM = True
+        SAVE_PLOT = None
+        t0 = 0
+        tN = t0 + test_len
 
-    anim = make_flow_anim(X.reshape(-1), Y.reshape(-1), V_x.reshape(test_len, -1), t0=t0, tN=tN,
-                          save_path=anim_save_path,
-                          title=anim_title)
+        anim = make_flow_anim(X.reshape(-1), Y.reshape(-1), V_x.reshape(test_len, -1), t0=t0, tN=tN,
+                              save_path=anim_save_path,
+                              title=anim_title)
 
-    print("pred mag shape is: ", pred_mag.shape)
-    # with open("Data/Processed/prediction_oscillating_Vx.npy", 'wb') as f:
-    #      np.save(f, pred_mag)
+    """
+    Saving Predictions
+    """
+    if save_prediction:
+        with open(pred_save_path, 'wb') as f:
+            np.save(f, pred)
+
+    """
+    Generating POD basis
+    """
+    if generate_POD:
+        _, energies, _, _, _ = calculate_POD_basis(pred.reshape(test_len, -1))
+        plt.scatter(np.arange(len(energies)), energies)
+        plt.show()
+
