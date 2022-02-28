@@ -3,15 +3,22 @@ from Utils.Plotters import *
 from NODE.NODE import *
 
 if __name__ == "__main__":
-    model_path = "SavedModels/dg_conv_gaussian_small.pth"
+    flow = 'dg'  # 'dg' for double gyre, 'vortex' for vortex shedding
+    model_path = "SavedModels/dg_conv_gaussian_square.pth"
     training_data_path = "Data/Processed/dg_flow_field.npy"
-    init_con_snapshot = 0
+    init_con_snapshot = 100
     grid_path = "Data/Processed/dg_grid.npy"
     test_len = 100  # length of prediction to generate
-    step_skip = 4  # number of steps within one time interval
-    anim_save_path = "Data/Video/prediction3_dg_on_training_data"
-    anim_title = "training prediction3 dg"
-    data_shrink_scale = 3
+    step_skip = 6  # number of steps within one time interval
+    anim_save_path = "Data/Video/prediction_dg_square_on_testing_data"
+    anim_title = "testing prediction dg square"
+
+    if flow == 'dg':
+        data_shrink_scale = 2
+    elif flow == 'vortex':
+        data_shrink_scale = 1
+    else:
+        print("There is no such flow type!")
 
     """
     load pretrained model
@@ -22,9 +29,13 @@ if __name__ == "__main__":
     Load initial condition from data 
     """
     processed_data = np.load(training_data_path)[:, :, ::data_shrink_scale, ::data_shrink_scale]
-    grid = np.load(grid_path)
-    X = grid[0, ::data_shrink_scale, ::data_shrink_scale]
-    Y = grid[1, ::data_shrink_scale, ::data_shrink_scale]
+    grid = np.load(grid_path)[:, ::data_shrink_scale, ::data_shrink_scale]
+    if flow == 'dg':
+        # cropping double gyre to a square
+        processed_data = processed_data[:, :, :50, :50]
+        grid = grid[:, :50, :50]
+    X = grid[0, :, :]
+    Y = grid[1, :, :]
     initial_condition = torch.tensor(processed_data[init_con_snapshot]).unsqueeze(0)
     print("Initial condition has shape: ", initial_condition.shape)
 
