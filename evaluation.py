@@ -6,7 +6,7 @@ if __name__ == "__main__":
     flow = 'dg'  # 'dg' for double gyre, 'vortex' for vortex shedding
     model_path = "SavedModels/dg_conv_gaussian_square.pth"
     training_data_path = "Data/Processed/dg_flow_field.npy"
-    init_con_snapshot = 100
+    init_con_snapshot = 0
     grid_path = "Data/Processed/dg_grid.npy"
     test_len = 100  # length of prediction to generate
     step_skip = 6  # number of steps within one time interval
