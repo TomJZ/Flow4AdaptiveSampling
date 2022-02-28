@@ -9,7 +9,8 @@ if __name__ == '__main__':
     """
     Load Training Data
     """
-    dg_data = np.load("Data/Processed/dg_flow_field.npy")[:, :, ::3, ::3]
+    downsize_ratio = 2
+    dg_data = np.load("Data/Processed/dg_flow_field.npy")[:, :, ::downsize_ratio, ::downsize_ratio][:, :, :50, :50]
 
     training_data = dg_data
     all_len, nc, x_size, y_size = training_data.shape
@@ -30,10 +31,10 @@ if __name__ == '__main__':
     lookahead = 2
     iter_offset = 0
     lr = 0.001
-    save_path = "SavedModels/vortex_conv_gaussian_dg"  # file extenssion will be added in training loop
+    save_path = "SavedModels/dg_conv_gaussian_sqaure"  # file extenssion will be added in training loop
     train_start_idx = 0  # the index from which training data takes from all data
-    train_len = 180  # length of training data
-    step_skip = 6  # number of steps per time interval
+    train_len = 20  # length of training data
+    step_skip = 3  # number of steps per time interval
     obs = torch.tensor(training_data[train_start_idx:train_start_idx + train_len]).view(train_len, 2, x_size,
                                                                                         y_size).double().to(device)
     obs_t = step_skip * torch.tensor((np.arange(len(obs))).astype(int))
@@ -47,10 +48,9 @@ if __name__ == '__main__':
 
     # make_color_map(z_p[:, :, :, :].detach().numpy().reshape([train_len, -1]), "Training ConvNN for KS\n",
     #                slice=False, save=None, figure_size=(8, 3))
-    make_color_map(obs[:, :, :, :].detach().numpy().reshape([train_len, -1]), "Training ConvNN for KS\n",
-                   slice=False, save=None, figure_size=(8, 3))
-
-    plt.show()
+    # make_color_map(obs[:, :, :, :].detach().cpu().numpy().reshape([train_len, -1]), "Training ConvNN for KS\n",
+    #                slice=False, save=None, figure_size=(8, 3))
+    # plt.show()
 
     sample_and_grow_PDE(ode_train, obs, obs_t, epochs, lookahead, iter_offset, lr,
-                       save_path, plot_freq=20)
+                        save_path, plot_freq=20)
