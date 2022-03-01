@@ -32,7 +32,7 @@ if __name__ == '__main__':
     lookahead = 2
     iter_offset = 0
     lr = 0.001
-    save_path = "SavedModels/vortex_conv_gaussian_sqaure"  # file extenssion will be added in training loop
+    save_path = "SavedModels/vortex_conv_gaussian_square"  # file extenssion will be added in training loop
     train_start_idx = 0  # the index from which training data takes from all data
     train_len = 20  # length of training data
     step_skip = 3  # number of steps per time interval

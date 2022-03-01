@@ -5,7 +5,7 @@ from NODE.NODE import *
 
 if __name__ == "__main__":
     flow = 'vortex'  # 'dg' for double gyre, 'vortex' for vortex shedding
-    model_path = "SavedModels/vortex_conv_gaussian_sqaure.pth"
+    model_path = "SavedModels/vortex_conv_gaussian_square.pth"
     training_data_path = "Data/Processed/vortex_re200_with_turbulence.npy"
     init_con_snapshot = 200
     grid_path = "Data/Processed/vortex_regularized_grid.npy"
