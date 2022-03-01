@@ -319,7 +319,8 @@ class VortexConvGaussianSquare(ODEF):
         self.lin1 = nn.Linear(1152, 128, bias=bias)
         self.lin3 = nn.Linear(128, 2 * 30 * 30, bias=bias)
 
-        self.relu = nn.Tanh()
+        self.relu = nn.ReLU()
+        self.tanh = nn.Tanh()
 
         # Create gaussian kernels
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -341,11 +342,11 @@ class VortexConvGaussianSquare(ODEF):
         # print("bs: ", bs)
         x = x.view(bs, nc, imgx, imgy)
         # print("x in", x.size())
-        x = self.relu(self.enc_conv1(x))
-        x = self.relu(self.enc_conv2(x))
-        x = self.relu(self.enc_conv3(x))
-        x = self.relu(self.enc_conv4(x))
-        x = self.relu(self.enc_conv5(x))
+        x = self.tanh(self.enc_conv1(x))
+        x = self.tanh(self.enc_conv2(x))
+        x = self.tanh(self.enc_conv3(x))
+        x = self.tanh(self.enc_conv4(x))
+        x = self.tanh(self.enc_conv5(x))
 
 
         x = x.view(bs, -1)

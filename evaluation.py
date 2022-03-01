@@ -4,18 +4,19 @@ from Utils.POD import *
 from NODE.NODE import *
 
 if __name__ == "__main__":
-    flow = 'dg'  # 'dg' for double gyre, 'vortex' for vortex shedding
-    model_path = "SavedModels/dg_conv_gaussian_square.pth"
-    training_data_path = "Data/Processed/dg_flow_field.npy"
-    init_con_snapshot = 0
-    grid_path = "Data/Processed/dg_grid.npy"
+    flow = 'vortex'  # 'dg' for double gyre, 'vortex' for vortex shedding
+    model_path = "SavedModels/vortex_conv_gaussian_sqaure.pth"
+    training_data_path = "Data/Processed/vortex_re200_with_turbulence.npy"
+    init_con_snapshot = 200
+    grid_path = "Data/Processed/vortex_regularized_grid.npy"
     test_len = 100  # length of prediction to generate
     step_skip = 6  # number of steps within one time interval
-    anim_save_path = "Data/Video/prediction_dg_square_on_testing_data"
-    anim_title = "testing prediction dg square"
+    anim_save_path = "Data/Video/prediction_vortex_square_on_training_data"
+    anim_title = "training prediction vortex square"
     pred_save_path = "Data/Predictions/test.npy"
-    generate_animation = False  # whether to generate animation and save
-    generate_POD = True  # whether to compute POD energies
+    square = True  # if only looks at the square area in vortex shedding
+    generate_animation = True  # whether to generate animation and save
+    generate_POD = False  # whether to compute POD energies
     save_prediction = False  # whether to save predicted trajectories
 
     if flow == 'dg':
@@ -39,6 +40,11 @@ if __name__ == "__main__":
         # cropping double gyre to a square
         processed_data = processed_data[:, :, :50, :50]
         grid = grid[:, :50, :50]
+    else:
+        if square == True:
+            processed_data = processed_data[:, :, :30, :30]
+            grid = grid[:, :30, :30]
+
     X = grid[0, :, :]
     Y = grid[1, :, :]
     initial_condition = torch.tensor(processed_data[init_con_snapshot]).unsqueeze(0)
