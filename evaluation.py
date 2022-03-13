@@ -4,24 +4,26 @@ from Utils.POD import *
 from NODE.NODE import *
 
 if __name__ == "__main__":
-    flow = 'vortex'  # 'dg' for double gyre, 'vortex' for vortex shedding
-    model_path = "SavedModels/vortex_conv_gaussian_square.pth"
-    training_data_path = "Data/Processed/vortex_re200_with_turbulence.npy"
-    init_con_snapshot = 200
-    grid_path = "Data/Processed/vortex_regularized_grid.npy"
-    test_len = 300  # length of prediction to generate
+    flow = 'noaa'  # 'dg' for double gyre, 'vortex' for vortex shedding, 'noaa' for ocean data
+    model_path = "SavedModels/noaa_conv_gaussian.pth"
+    training_data_path = "Data/Processed/noaa_flow_field.npy"
+    init_con_snapshot = 0
+    grid_path = "Data/Processed/noaa_grid.npy"
+    test_len = 100  # length of prediction to generate
     step_skip = 6  # number of steps within one time interval
-    anim_save_path = "Data/Video/prediction_vortex_square_on_training_data"
-    anim_title = "training prediction vortex square"
+    anim_save_path = "Data/Video/prediction_noaa_on_training_data"
+    anim_title = "training prediction noaa"
     pred_save_path = "Data/Predictions/test2.npy"
     square = True  # if only looks at the square area in vortex shedding
-    generate_animation = False  # whether to generate animation and save
-    generate_POD = False  # whether to compute POD energies
-    save_prediction = True  # whether to save predicted trajectories
+    generate_animation = True  # whether to generate animation and save
+    generate_POD = True  # whether to compute POD energies
+    save_prediction = False  # whether to save predicted trajectories
 
     if flow == 'dg':
         data_shrink_scale = 2
     elif flow == 'vortex':
+        data_shrink_scale = 1
+    elif flow == 'noaa':
         data_shrink_scale = 1
     else:
         print("There is no such flow type!")
@@ -40,7 +42,10 @@ if __name__ == "__main__":
         # cropping double gyre to a square
         processed_data = processed_data[:, :, :50, :50]
         grid = grid[:, :50, :50]
-    else:
+    elif flow == 'noaa':
+        # noaa data is already cropped to a square
+        processed_data = processed_data.astype(np.double)
+    elif flow == 'vortex':
         if square == True:
             processed_data = processed_data[:, :, :30, :30]
             grid = grid[:, :30, :30]
