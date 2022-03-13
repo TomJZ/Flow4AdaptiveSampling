@@ -9,15 +9,15 @@ if __name__ == "__main__":
     training_data_path = "Data/Processed/vortex_re200_with_turbulence.npy"
     init_con_snapshot = 200
     grid_path = "Data/Processed/vortex_regularized_grid.npy"
-    test_len = 100  # length of prediction to generate
+    test_len = 300  # length of prediction to generate
     step_skip = 6  # number of steps within one time interval
     anim_save_path = "Data/Video/prediction_vortex_square_on_training_data"
     anim_title = "training prediction vortex square"
-    pred_save_path = "Data/Predictions/test.npy"
+    pred_save_path = "Data/Predictions/test2.npy"
     square = True  # if only looks at the square area in vortex shedding
-    generate_animation = True  # whether to generate animation and save
+    generate_animation = False  # whether to generate animation and save
     generate_POD = False  # whether to compute POD energies
-    save_prediction = False  # whether to save predicted trajectories
+    save_prediction = True  # whether to save predicted trajectories
 
     if flow == 'dg':
         data_shrink_scale = 2

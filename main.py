@@ -12,8 +12,9 @@ if __name__ == '__main__':
     downsize_ratio = 2
     dg_data = np.load("Data/Processed/dg_flow_field.npy")[:, :, ::downsize_ratio, ::downsize_ratio][:, :, :50, :50]
     vortex_square_data = np.load("Data/Processed/vortex_re200_with_turbulence.npy")[:, :, :30, :30]
+    noaa_data = np.load("Data/Processed/noaa_flow_field.npy")
 
-    training_data = vortex_square_data
+    training_data = noaa_data
     all_len, nc, x_size, y_size = training_data.shape
     print("All data shape is: ", training_data.shape)
 
@@ -25,17 +26,17 @@ if __name__ == '__main__':
     step_size = 0.01
     loss_arr = []  # initializing loss array
     # initialize NODE model
-    ode_train = NeuralODE(VortexConvGaussianSquare().to(device), ode_solve, step_size).double().to(device)
+    ode_train = NeuralODE(NOAAConvGaussian().to(device), ode_solve, step_size).double().to(device)
     # ode_train = torch.load("SavedModels/vortex_conv_gaussian_noTurb.pth")['ode_train']
     n_grid = x_size * y_size  # grid size
-    epochs = 1300
+    epochs = 2000
     lookahead = 2
     iter_offset = 0
     lr = 0.001
-    save_path = "SavedModels/vortex_conv_gaussian_square"  # file extenssion will be added in training loop
+    save_path = "SavedModels/noaa_conv_gaussian"  # file extenssion will be added in training loop
     train_start_idx = 0  # the index from which training data takes from all data
-    train_len = 20  # length of training data
-    step_skip = 3  # number of steps per time interval
+    train_len = 100  # length of training data
+    step_skip = 6  # number of steps per time interval
     obs = torch.tensor(training_data[train_start_idx:train_start_idx + train_len]).view(train_len, 2, x_size,
                                                                                         y_size).double().to(device)
     obs_t = step_skip * torch.tensor((np.arange(len(obs))).astype(int))

@@ -42,29 +42,42 @@ if __name__ == '__main__':
     #
     dg_flow_field = np.load("Data/Processed/dg_flow_field.npy")
     dg_flow_field = dg_flow_field[:, :, ::2, ::2]
-    print(dg_flow_field.shape)
+    #print(dg_flow_field.shape)
     dg_U = dg_flow_field[:, 0, :50, :50].reshape(200, -1)
     dg_V = dg_flow_field[:, 1, :50, :50].reshape(200, -1)
-    print(dg_U.shape)
+    #print(dg_U.shape)
     dg_grid = np.load("Data/Processed/dg_grid.npy")
     dg_grid = dg_grid[:, ::2, ::2]
-    print(dg_grid.shape)
+    #print(dg_grid.shape)
     dg_X = dg_grid[0, :50, :50].reshape(-1)
     dg_Y = dg_grid[1, :50, :50].reshape(-1)
-    print(dg_X.shape)
-    #
+    #print(dg_X.shape)
+
+
+    noaa_flow_field = np.load("Data/Processed/noaa_flow_field.npy")[:200]
+    print("noaa field shape is ", noaa_flow_field.shape)
+    noaa_len = len(noaa_flow_field)
+    noaa_U = noaa_flow_field[:, 0, :, :].reshape(noaa_len, -1)
+    noaa_V = noaa_flow_field[:, 1, :, :].reshape(noaa_len, -1)
+    noaa_grid = np.load("Data/Processed/noaa_grid.npy")
+    noaa_X = noaa_grid[0, :, :].reshape(-1)
+    noaa_Y = noaa_grid[1, :, :].reshape(-1)
+    print(noaa_X.shape)
+
+
     """
     Generating animation
     """
-    anim_data = dg_U
-    X = dg_X
-    Y = dg_Y
-    save_path = "Data/Video/dg_square_anim"
+    anim_data = noaa_U
+    anim_len = len(anim_data)
+    X = noaa_X
+    Y = noaa_Y
+    save_path = "Data/Video/noaa_anim"
     t0 = 0  # the first frame to start animating
-    tN = 50  # the last frame to stop animating
-    anim = make_flow_anim(X.reshape(-1), Y.reshape(-1), anim_data.reshape(200, -1), t0=t0, tN=tN,
+    tN = 200  # the last frame to stop animating
+    anim = make_flow_anim(X.reshape(-1), Y.reshape(-1), anim_data.reshape(anim_len, -1), t0=t0, tN=tN,
                           save_path=save_path,
-                          title="dg square")
+                          title="noaa nowcast Vx")
 
     # # save training data
     # regularized_grid = np.stack([X_reg, Y_reg])
