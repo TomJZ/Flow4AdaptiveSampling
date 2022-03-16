@@ -26,14 +26,14 @@ if __name__ == '__main__':
     step_size = 0.01
     loss_arr = []  # initializing loss array
     # initialize NODE model
-    ode_train = NeuralODE(NOAAConvGaussian().to(device), ode_solve, step_size).double().to(device)
+    ode_train = NeuralODE(NOAAConvGaussianNorm().to(device), ode_solve, step_size).double().to(device)
     # ode_train = torch.load("SavedModels/vortex_conv_gaussian_noTurb.pth")['ode_train']
     n_grid = x_size * y_size  # grid size
     epochs = 2000
     lookahead = 2
     iter_offset = 0
     lr = 0.001
-    save_path = "SavedModels/noaa_conv_gaussian"  # file extenssion will be added in training loop
+    save_path = "SavedModels/noaa_conv_gaussian_norm"  # file extenssion will be added in training loop
     train_start_idx = 0  # the index from which training data takes from all data
     train_len = 100  # length of training data
     step_skip = 6  # number of steps per time interval
