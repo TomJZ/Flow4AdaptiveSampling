@@ -444,8 +444,6 @@ class NOAAConvGaussianNorm(ODEF):
         self.lin1 = nn.Linear(1600, 128, bias=bias)
         self.lin3 = nn.Linear(128, 2 * 50 * 50, bias=bias)
 
-        #self.enc_bn6 = nn.BatchNorm1d(num_features=128)
-
         self.relu = nn.Tanh()
 
         # Create gaussian kernels

@@ -39,7 +39,7 @@ if __name__ == '__main__':
     #
     # mag = np.sqrt(vortex_V_x2**2 + vortex_V_y2**2)
     #
-    #
+    # Double Gyre
     dg_flow_field = np.load("Data/Processed/dg_flow_field.npy")
     dg_flow_field = dg_flow_field[:, :, ::2, ::2]
     #print(dg_flow_field.shape)
@@ -54,6 +54,7 @@ if __name__ == '__main__':
     #print(dg_X.shape)
 
 
+    # NOAA Ocean data
     noaa_flow_field = np.load("Data/Processed/noaa_flow_field.npy")[:200]
     print("noaa field shape is ", noaa_flow_field.shape)
     noaa_len = len(noaa_flow_field)
@@ -64,20 +65,24 @@ if __name__ == '__main__':
     noaa_Y = noaa_grid[1, :, :].reshape(-1)
     print(noaa_X.shape)
 
+    chaotic_vorticity = np.load("Data/Processed/chaotic_flow.npy")
+    chaotic_grid = np.load("Data/Processed/chaotic_flow_grid.npy")
+    chaotic_X, chaotic_Y = np.meshgrid(chaotic_grid, chaotic_grid)
+
 
     """
     Generating animation
     """
-    anim_data = noaa_U
+    anim_data = chaotic_vorticity
     anim_len = len(anim_data)
-    X = noaa_X
-    Y = noaa_Y
-    save_path = "Data/Video/noaa_anim"
+    X = chaotic_X
+    Y = chaotic_Y
+    save_path = "Data/Video/chaotic_NS"
     t0 = 0  # the first frame to start animating
-    tN = 200  # the last frame to stop animating
+    tN = 300  # the last frame to stop animating
     anim = make_flow_anim(X.reshape(-1), Y.reshape(-1), anim_data.reshape(anim_len, -1), t0=t0, tN=tN,
                           save_path=save_path,
-                          title="noaa nowcast Vx")
+                          title="Forced Turbulence")
 
     # # save training data
     # regularized_grid = np.stack([X_reg, Y_reg])
