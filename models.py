@@ -382,7 +382,7 @@ class NOAAConvGaussian(ODEF):
         self.relu = nn.Tanh()
 
         # Create gaussian kernels
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
         self.ker_size = 5
         self.sigma = 0.1
         self.kernel = Variable(Tensor(self.gkern(self.ker_size, self.sigma))).view(1, 1, self.ker_size,
@@ -444,7 +444,7 @@ class NOAAConvGaussianNorm(ODEF):
         self.lin1 = nn.Linear(1600, 128, bias=bias)
         self.lin3 = nn.Linear(128, 2 * 50 * 50, bias=bias)
 
-        self.enc_bn6 = nn.BatchNorm1d(128)
+        #self.enc_bn6 = nn.BatchNorm1d(num_features=128)
 
         self.relu = nn.Tanh()
 
@@ -476,7 +476,8 @@ class NOAAConvGaussianNorm(ODEF):
 
 
         x = x.view(bs, -1)
-        x = self.relu(self.enc_bn6(self.lin1(x)))
+        
+        x = self.relu(self.lin1(x))
         x = self.lin3(x)
 
         x = x.view(bs, nc, imgx, imgy)

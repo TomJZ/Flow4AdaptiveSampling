@@ -29,19 +29,19 @@ if __name__ == '__main__':
     ode_train = NeuralODE(NOAAConvGaussianNorm().to(device), ode_solve, step_size).double().to(device)
     # ode_train = torch.load("SavedModels/vortex_conv_gaussian_noTurb.pth")['ode_train']
     n_grid = x_size * y_size  # grid size
-    epochs = 2000
+    epochs = 2500
     lookahead = 2
     iter_offset = 0
     lr = 0.001
-    save_path = "SavedModels/noaa_conv_gaussian_norm"  # file extenssion will be added in training loop
+    save_path = "SavedModels/noaa_conv_gaussian_square2_normed_noise0_01"  # file extenssion will be added in training loop
     train_start_idx = 0  # the index from which training data takes from all data
     train_len = 100  # length of training data
     step_skip = 6  # number of steps per time interval
     obs = torch.tensor(training_data[train_start_idx:train_start_idx + train_len]).view(train_len, 2, x_size,
                                                                                         y_size).double().to(device)
     obs_t = step_skip * torch.tensor((np.arange(len(obs))).astype(int))
-    NOISE_VAR = 0.001  # Variance of gaussian noise added to the observation. Assumed to be 0-mean
-    obs[:, :, :, 0:2] = obs[:, :, :, 0:2] + torch.randn_like(obs[:, :, :, 0:2]) * NOISE_VAR
+    NOISE_VAR = 0.01  # Variance of gaussian noise added to the observation. Assumed to be 0-mean
+    obs[:, :, :, :] = obs[:, :, :, :] + torch.randn_like(obs[:, :, :, :]) * NOISE_VAR
     print("Training data shape is: \n", obs.shape)
     # run the model once
     # z_p = ode_train(obs[0].unsqueeze(0), obs_t,
