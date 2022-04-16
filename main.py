@@ -14,8 +14,9 @@ if __name__ == '__main__':
     vortex_square_data = np.load("Data/Processed/vortex_re200_with_turbulence.npy")[:, :, :30, :30]
     noaa_data = np.load("Data/Processed/noaa_flow_field.npy")
     forced_turb_data = np.load("Data/Processed/chaotic_flow.npy").reshape([2000, 1, 80, 80])
+    gaussian_data = np.load("Data/Processed/gaussian1.npy").reshape([-1, 1, 30, 30])
 
-    training_data = forced_turb_data
+    training_data = gaussian_data
     all_len, nc, x_size, y_size = training_data.shape
     print("All data shape is: ", training_data.shape)
 
@@ -27,16 +28,16 @@ if __name__ == '__main__':
     step_size = 0.01
     loss_arr = []  # initializing loss array
     # initialize NODE model
-    ode_train = NeuralODE(ChaoticGaussianNorm().to(device), ode_solve, step_size).double().to(device)
+    ode_train = NeuralODE(GaussianNet().to(device), ode_solve, step_size).double().to(device)
     # ode_train = torch.load("SavedModels/vortex_conv_gaussian_noTurb.pth")['ode_train']
     n_grid = x_size * y_size  # grid size
     epochs = 2500
     lookahead = 2
     iter_offset = 0
     lr = 0.001
-    save_path = "SavedModels/chaotic_conv_gaussian_normed_noise0_01"  # file extenssion will be added in training loop
+    save_path = "SavedModels/chaotic_conv_gaussian_normed_noise0_01"  # file extension will be added in training loop
     train_start_idx = 0  # the index from which training data takes from all data
-    train_len = 100  # length of training data
+    train_len = 80  # length of training data
     step_skip = 6  # number of steps per time interval
     obs = torch.tensor(training_data[train_start_idx:train_start_idx + train_len]).view(train_len, nc, x_size,
                                                                                         y_size).double().to(device)
