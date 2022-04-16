@@ -4,14 +4,14 @@ from Utils.POD import *
 from NODE.NODE import *
 
 if __name__ == "__main__":
-    flow = 'chaotic'  # 'dg' for double gyre, 'vortex' for vortex shedding, 'noaa' for ocean data
-    model_path = "SavedModels/chaotic_conv_gaussian_normed_noise0_01_step6.pth"
-    training_data_path = "Data/Processed/chaotic_flow.npy"
+    flow = 'chaotic'  # 'dg' for double gyre, 'vortex' for vortex shedding, 'noaa' for ocean data, 'chaotic' for forced turbulence, 'gaussian' for gaussian blobs
+    model_path = "SavedModels/gaussian1_normed_noise0_01.pth"
+    training_data_path = "Data/Processed/gaussian1.npy"
     init_con_snapshot = 0
-    grid_path = "Data/Processed/chaotic_flow_grid.npy"
+    grid_path = "Data/Processed/gaussian_grid.npy"
     test_len = 100  # length of prediction to generate
     step_skip = 6  # number of steps within one time interval
-    anim_save_path = "Data/Video/prediction_chaotic_on_training_data"
+    anim_save_path = "Data/Video/gaussian1_pred"
     anim_title = "training prediction chaotic vorticity"
     pred_save_path = "Data/Predictions/na.npy"
     square = True  # if only looks at the square area in vortex shedding
@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
     if flow == 'dg':
         data_shrink_scale = 2
-    elif flow == 'vortex' or flow == 'noaa' or flow == 'chaotic':
+    elif flow == 'vortex' or flow == 'noaa' or flow == 'chaotic' or flow == 'gaussian':
         data_shrink_scale = 1
     else:
         print("There is no such flow type!")
@@ -40,7 +40,7 @@ if __name__ == "__main__":
         # cropping double gyre to a square
         processed_data = processed_data[:, :, :50, :50]
         grid = grid[:, :50, :50]
-    elif flow == 'noaa' or flow == 'chaotic':
+    elif flow == 'noaa' or flow == 'chaotic' or flow == 'gaussian':
         # noaa data is already cropped to a square
         processed_data = processed_data.astype(np.double)
     elif flow == 'vortex':
@@ -68,7 +68,7 @@ if __name__ == "__main__":
     print("Prediction has shape: ", pred.shape)
     # predicted V_x and V_y
     V_x = pred[:, 0, :, :]
-    if flow != 'chaotic':
+    if flow != 'chaotic' and flow != 'gaussian':
         V_y = pred[:, 1, :, :]
         mag = np.sqrt(V_x ** 2 + V_y ** 2)
 
