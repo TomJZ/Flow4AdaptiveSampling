@@ -4,26 +4,24 @@ from Utils.POD import *
 from NODE.NODE import *
 
 if __name__ == "__main__":
-    flow = 'noaa'  # 'dg' for double gyre, 'vortex' for vortex shedding, 'noaa' for ocean data
-    model_path = "SavedModels/noaa_conv_gaussian_norm_noise0_01.pth"
-    training_data_path = "Data/Processed/noaa_flow_field.npy"
+    flow = 'chaotic'  # 'dg' for double gyre, 'vortex' for vortex shedding, 'noaa' for ocean data
+    model_path = "SavedModels/chaotic_conv_gaussian_normed_noise0_01_step6.pth"
+    training_data_path = "Data/Processed/chaotic_flow.npy"
     init_con_snapshot = 0
-    grid_path = "Data/Processed/noaa_grid.npy"
-    test_len = 200  # length of prediction to generate
+    grid_path = "Data/Processed/chaotic_flow_grid.npy"
+    test_len = 100  # length of prediction to generate
     step_skip = 6  # number of steps within one time interval
-    anim_save_path = "Data/Video/prediction_noaa_on_training_data"
-    anim_title = "training prediction noaa"
-    pred_save_path = "Data/Predictions/noisy_norm_check.npy"
+    anim_save_path = "Data/Video/prediction_chaotic_on_training_data"
+    anim_title = "training prediction chaotic vorticity"
+    pred_save_path = "Data/Predictions/na.npy"
     square = True  # if only looks at the square area in vortex shedding
-    generate_animation = False  # whether to generate animation and save
-    generate_POD = True  # whether to compute POD energies
-    save_prediction = True  # whether to save predicted trajectories
+    generate_animation = True  # whether to generate animation and save
+    generate_POD = False  # whether to compute POD energies
+    save_prediction = False  # whether to save predicted trajectories
 
     if flow == 'dg':
         data_shrink_scale = 2
-    elif flow == 'vortex':
-        data_shrink_scale = 1
-    elif flow == 'noaa':
+    elif flow == 'vortex' or flow == 'noaa' or flow == 'chaotic':
         data_shrink_scale = 1
     else:
         print("There is no such flow type!")
@@ -42,11 +40,11 @@ if __name__ == "__main__":
         # cropping double gyre to a square
         processed_data = processed_data[:, :, :50, :50]
         grid = grid[:, :50, :50]
-    elif flow == 'noaa':
+    elif flow == 'noaa' or flow == 'chaotic':
         # noaa data is already cropped to a square
         processed_data = processed_data.astype(np.double)
     elif flow == 'vortex':
-        if square == True:
+        if square:
             processed_data = processed_data[:, :, :30, :30]
             grid = grid[:, :30, :30]
 
@@ -70,8 +68,9 @@ if __name__ == "__main__":
     print("Prediction has shape: ", pred.shape)
     # predicted V_x and V_y
     V_x = pred[:, 0, :, :]
-    V_y = pred[:, 1, :, :]
-    mag = np.sqrt(V_x ** 2 + V_y ** 2)
+    if flow != 'chaotic':
+        V_y = pred[:, 1, :, :]
+        mag = np.sqrt(V_x ** 2 + V_y ** 2)
 
     """
     Animating Predictions
@@ -100,4 +99,3 @@ if __name__ == "__main__":
         _, energies, _, _, _ = calculate_POD_basis(pred.reshape(test_len, -1))
         plt.scatter(np.arange(len(energies)), energies)
         plt.show()
-
