@@ -13,7 +13,7 @@ if __name__ == '__main__':
     dg_data = np.load("Data/Processed/dg_flow_field.npy")[:, :, ::downsize_ratio, ::downsize_ratio][:, :, :50, :50]
     vortex_square_data = np.load("Data/Processed/vortex_re200_with_turbulence.npy")[:, :, :30, :30]
     noaa_data = np.load("Data/Processed/noaa_flow_field.npy")
-    forced_turb_data = np.load("Data/Processed/chaotic_flow.npy").reshape([2000, 1, 80, 80])
+    forced_turb_data = np.load("Data/Processed/chaotic_80by80.npy").reshape([2000, 1, 80, 80])
     gaussian_data = np.load("Data/Processed/gaussian1.npy").reshape([-1, 1, 30, 30])
 
     training_data = gaussian_data

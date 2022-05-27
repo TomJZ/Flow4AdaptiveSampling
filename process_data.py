@@ -65,9 +65,9 @@ if __name__ == '__main__':
     noaa_Y = noaa_grid[1, :, :].reshape(-1)
     print(noaa_X.shape)
 
-    chaotic_vorticity = np.load("Data/Processed/chaotic_flow.npy")
-    chaotic_grid = np.load("Data/Processed/chaotic_flow_grid.npy")
-    chaotic_X, chaotic_Y = np.meshgrid(chaotic_grid, chaotic_grid)
+    chaotic_vorticity = np.load("Data/Processed/chaotic_40by40.npy")
+    chaotic_grid = np.load("Data/Processed/chaotic_grid_40by40.npy")
+    chaotic_X, chaotic_Y = chaotic_grid[0, :], chaotic_grid[1, :]
 
 
     """
@@ -77,7 +77,7 @@ if __name__ == '__main__':
     anim_len = len(anim_data)
     X = chaotic_X
     Y = chaotic_Y
-    save_path = "Data/Video/chaotic_NS"
+    save_path = "Data/Video/chaotic_40by40"
     t0 = 0  # the first frame to start animating
     tN = 300  # the last frame to stop animating
     anim = make_flow_anim(X.reshape(-1), Y.reshape(-1), anim_data.reshape(anim_len, -1), t0=t0, tN=tN,
