@@ -5,13 +5,13 @@ from NODE.NODE import *
 
 if __name__ == "__main__":
     flow = 'chaotic'  # 'dg' for double gyre, 'vortex' for vortex shedding, 'noaa' for ocean data, 'chaotic' for forced turbulence, 'gaussian' for gaussian blobs
-    model_path = "SavedModels/gaussian1_normed_noise0_01.pth"
-    training_data_path = "Data/Processed/gaussian1.npy"
-    init_con_snapshot = 0
-    grid_path = "Data/Processed/gaussian_grid.npy"
-    test_len = 100  # length of prediction to generate
+    model_path = "SavedModels/chaotic_conv_gaussian_40by40_normed_noise0_001_4000epochs_model2.pth"
+    training_data_path = "Data/Processed/chaotic_40by40.npy"
+    init_con_snapshot = 203
+    grid_path = "Data/Processed/chaotic_grid_40by40.npy"
+    test_len = 20  # length of prediction to generate
     step_skip = 6  # number of steps within one time interval
-    anim_save_path = "Data/Video/gaussian1_pred"
+    anim_save_path = "Data/Video/chaotic_40by40_pred"
     anim_title = "training prediction chaotic vorticity"
     pred_save_path = "Data/Predictions/na.npy"
     square = True  # if only looks at the square area in vortex shedding
@@ -34,7 +34,7 @@ if __name__ == "__main__":
     """
     Load initial condition from data 
     """
-    processed_data = np.load(training_data_path)[:, :, ::data_shrink_scale, ::data_shrink_scale]
+    processed_data = np.load(training_data_path).reshape([-1, 1, 40, 40])[:, :, ::data_shrink_scale, ::data_shrink_scale]
     grid = np.load(grid_path)[:, ::data_shrink_scale, ::data_shrink_scale]
     if flow == 'dg':
         # cropping double gyre to a square
