@@ -8,10 +8,11 @@ if __name__ == "__main__":
     model_path = "SavedModels/chaotic_conv_gaussian_40by40_normed_noise0_001_18000epochs_model2_1100trainlen.pth"
     training_data_path = "Data/Processed/chaotic_40by40.npy"
     init_con_snapshot = 1100
+
     grid_path = "Data/Processed/chaotic_grid_40by40.npy"
     test_len = 400  # length of prediction to generate
     step_skip = 6  # number of steps within one time interval
-    anim_save_path = "Data/Video/chaotic_40by40_pred"
+    anim_save_path = "Data/Video/chaotic_40by40_short_pred"
     anim_title = "training prediction chaotic vorticity"
     pred_save_path = "Data/Predictions/chaotic_1100_to_1500.npy"
     square = True  # if only looks at the square area in vortex shedding
