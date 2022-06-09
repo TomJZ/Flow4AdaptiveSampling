@@ -5,19 +5,19 @@ from NODE.NODE import *
 
 if __name__ == "__main__":
     flow = 'chaotic'  # 'dg' for double gyre, 'vortex' for vortex shedding, 'noaa' for ocean data, 'chaotic' for forced turbulence, 'gaussian' for gaussian blobs
-    model_path = "SavedModels/chaotic_conv_gaussian_40by40_normed_noise0_001_4000epochs_model2.pth"
+    model_path = "SavedModels/chaotic_conv_gaussian_40by40_normed_noise0_001_18000epochs_model2_1100trainlen.pth"
     training_data_path = "Data/Processed/chaotic_40by40.npy"
-    init_con_snapshot = 203
+    init_con_snapshot = 1100
     grid_path = "Data/Processed/chaotic_grid_40by40.npy"
-    test_len = 20  # length of prediction to generate
+    test_len = 400  # length of prediction to generate
     step_skip = 6  # number of steps within one time interval
     anim_save_path = "Data/Video/chaotic_40by40_pred"
     anim_title = "training prediction chaotic vorticity"
-    pred_save_path = "Data/Predictions/na.npy"
+    pred_save_path = "Data/Predictions/chaotic_1100_to_1500.npy"
     square = True  # if only looks at the square area in vortex shedding
-    generate_animation = True  # whether to generate animation and save
+    generate_animation = False  # whether to generate animation and save
     generate_POD = False  # whether to compute POD energies
-    save_prediction = False  # whether to save predicted trajectories
+    save_prediction = True  # whether to save predicted trajectories
 
     if flow == 'dg':
         data_shrink_scale = 2
