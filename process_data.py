@@ -77,12 +77,12 @@ if __name__ == '__main__':
     anim_len = len(anim_data)
     X = chaotic_X
     Y = chaotic_Y
-    save_path = "Data/Video/chaotic_40by40"
-    t0 = 0  # the first frame to start animating
-    tN = 300  # the last frame to stop animating
+    save_path = "Data/Video/chaotic_40by40_2000to2020"
+    t0 = 2000  # the first frame to start animating
+    tN = 2020  # the last frame to stop animating
     anim = make_flow_anim(X.reshape(-1), Y.reshape(-1), anim_data.reshape(anim_len, -1), t0=t0, tN=tN,
                           save_path=save_path,
-                          title="Forced Turbulence")
+                          title="Forced Turbulence 40by40")
 
     # # save training data
     # regularized_grid = np.stack([X_reg, Y_reg])
