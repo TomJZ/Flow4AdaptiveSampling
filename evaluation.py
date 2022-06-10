@@ -10,7 +10,7 @@ if __name__ == "__main__":
     init_con_snapshot = 1100
 
     grid_path = "Data/Processed/chaotic_grid_40by40.npy"
-    test_len = 400  # length of prediction to generate
+    test_len = 100  # length of prediction to generate
     step_skip = 6  # number of steps within one time interval
     anim_save_path = "Data/Video/chaotic_40by40_short_pred"
     anim_title = "training prediction chaotic vorticity"
@@ -18,7 +18,7 @@ if __name__ == "__main__":
     square = True  # if only looks at the square area in vortex shedding
     generate_animation = False  # whether to generate animation and save
     generate_POD = False  # whether to compute POD energies
-    save_prediction = True  # whether to save predicted trajectories
+    save_prediction = False  # whether to save predicted trajectories
 
     if flow == 'dg':
         data_shrink_scale = 2
