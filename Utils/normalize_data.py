@@ -1,20 +1,28 @@
 import numpy as np
-from sklearn.preprocessing import normalize
+from sklearn import preprocessing
 
-def normalize_data(x):
-    n_samples, *a = x.shape
-    x = x.reshape([1, -1])
-    normalized_x = normalize(x, axis=0)
-    a.insert(0, n_samples)
-    return normalized_x.reshape(a)
+def normalize_data(X_train,scaler="minmax"):
+    bs, *a = X_train.shape
+    X_train = X_train.reshape([bs, -1])
+    if scaler == "minmax":
+        scaler = preprocessing.MinMaxScaler().fit(X_train)
+    elif scaler == "standard":
+        scaler = preprocessing.StandardScaler().fit(X_train)
+
+    X_scaled = scaler.transform(X_train)
+    a.insert(0, bs)
+    X_scaled = X_scaled.reshape(a)
+    print("normalized shape: ", X_scaled.shape)
+    return X_scaled
+
 
 if __name__ == "__main__":
-    # data = np.load("../Data/Processed/chaotic_40by40_vorticity.npy")
-    # data = normalize_data(data)
-    # with open("../Data/Processed/chaotic_40by40_vorticity_normed.npy", "wb") as f:
-    #     np.save(f, data)
+    data = np.load("../Data/Processed/chaotic_40by40_vorticity.npy")
+    data = normalize_data(data, "standard")
+    with open("../Data/Processed/chaotic_40by40_vorticity_standard_scaled.npy", "wb") as f:
+        np.save(f, data)
 
     data = np.load("../Data/Processed/noaa_flow_field.npy")
-    data = normalize_data(data)
-    with open("../Data/Processed/noaa_flow_field_normed.npy", "wb") as f:
+    data = normalize_data(data, "standard")
+    with open("../Data/Processed/noaa_flow_field_standard_scaled.npy", "wb") as f:
         np.save(f, data)

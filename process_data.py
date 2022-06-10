@@ -33,7 +33,7 @@ if __name__ == '__main__':
     # vortex_V_x2 = vortex_withTurb[:, 0, :, :].reshape(383, -1)
     # vortex_V_y2 = vortex_withTurb[:, 1, :, :].reshape(383, -1)
     # diff = vortex_V_x - vortex_V_x2
-    vortex_grid = np.load("Data/Processed/vortex_regularized_grid.npy")
+    vortex_grid = np.load("Data/Processed/vortex_grid.npy")
     vortex_X = vortex_grid[0, :, :].reshape(-1)
     vortex_Y = vortex_grid[1, :, :].reshape(-1)
     #
@@ -65,8 +65,8 @@ if __name__ == '__main__':
     noaa_Y = noaa_grid[1, :, :].reshape(-1)
     print(noaa_X.shape)
 
-    chaotic_vorticity = np.load("Data/Processed/chaotic_40by40.npy")
-    chaotic_grid = np.load("Data/Processed/chaotic_grid_40by40.npy")
+    chaotic_vorticity = np.load("Data/Processed/chaotic_40by40_vorticity_standard_scaled.npy")
+    chaotic_grid = np.load("Data/Processed/chaotic_40by40_grid.npy")
     chaotic_X, chaotic_Y = chaotic_grid[0, :], chaotic_grid[1, :]
 
 
@@ -77,7 +77,7 @@ if __name__ == '__main__':
     anim_len = len(anim_data)
     X = chaotic_X
     Y = chaotic_Y
-    save_path = "Data/Video/chaotic_40by40_2000to2020"
+    save_path = "Data/Video/chaotic_40by40_standard_data_2000to2020"
     t0 = 2000  # the first frame to start animating
     tN = 2020  # the last frame to stop animating
     anim = make_flow_anim(X.reshape(-1), Y.reshape(-1), anim_data.reshape(anim_len, -1), t0=t0, tN=tN,
