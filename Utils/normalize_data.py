@@ -13,6 +13,9 @@ def normalize_data(X_train,scaler="minmax"):
     a.insert(0, bs)
     X_scaled = X_scaled.reshape(a)
     print("normalized shape: ", X_scaled.shape)
+    print("normalized shape: ", X_scaled.shape)
+    print("original data mean: {0}, std: {1}".format(np.mean(X_train), np.std(X_train)))
+    print("normalized data mean: {0}, std: {1}".format(np.mean(X_scaled), np.std(X_scaled)))
     return X_scaled
 
 

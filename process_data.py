@@ -77,9 +77,9 @@ if __name__ == '__main__':
     anim_len = len(anim_data)
     X = chaotic_X
     Y = chaotic_Y
-    save_path = "Data/Video/chaotic_40by40_standard_data_2000to2020"
-    t0 = 2000  # the first frame to start animating
-    tN = 2020  # the last frame to stop animating
+    save_path = "Data/Video/chaotic_40by40_standard_data_1400to1420"
+    t0 = 1400  # the first frame to start animating
+    tN = 1420  # the last frame to stop animating
     anim = make_flow_anim(X.reshape(-1), Y.reshape(-1), anim_data.reshape(anim_len, -1), t0=t0, tN=tN,
                           save_path=save_path,
                           title="Forced Turbulence 40by40")
