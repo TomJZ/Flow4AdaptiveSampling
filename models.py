@@ -856,4 +856,69 @@ class ChaoticGaussian40by40Norm2(ODEF):
         return x_smooth_x
 
 
+class ChaoticFlowField40by40Norm(ODEF):
+    # for size 40 by 40
+    def __init__(self):
+        super(ChaoticFlowField40by40Norm, self).__init__()
+        bias = True
+        self.enc_conv1 = nn.Conv2d(2, 32, kernel_size=3, stride=1, padding=0, bias=bias)
+        self.enc_conv2 = nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=0, bias=bias)
+        self.enc_conv3 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1, bias=bias)
+        self.enc_conv4 = nn.Conv2d(64, 64, kernel_size=3, stride=2, padding=1, bias=bias)
+        self.enc_conv5 = nn.Conv2d(64, 16, kernel_size=3, stride=2, padding=0, bias=bias)
+
+        self.enc_bn1 = nn.BatchNorm2d(32)
+        self.enc_bn2 = nn.BatchNorm2d(32)
+        self.enc_bn3 = nn.BatchNorm2d(64)
+        self.enc_bn4 = nn.BatchNorm2d(64)
+        self.enc_bn5 = nn.BatchNorm2d(16)
+
+        self.lin1 = nn.Linear(1024, 256, bias=bias)
+        self.lin3 = nn.Linear(256, 2 * 40 * 40, bias=bias)
+
+        self.relu = nn.Tanh()
+
+        # Create gaussian kernels
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.ker_size = 3
+        self.sigma = 0.3
+        self.kernel = Variable(Tensor(self.gkern(self.ker_size, self.sigma))).view(1, 1, self.ker_size,
+                                                                                   self.ker_size).to(device).double()
+
+    def gkern(self, kernlen=11, nsig=0.05):  # large nsig gives more freedom(pixels as agents), small nsig is more fluid
+        """Returns a 2D Gaussian kernel."""
+        x = np.linspace(-nsig, nsig, kernlen + 1)
+        kern1d = np.diff(st.norm.cdf(x))
+        kern2d = np.outer(kern1d, kern1d)
+        ker = kern2d / kern2d.sum()
+        return ker
+
+    def forward(self, x):
+        bs, nc, imgx, imgy = x.shape
+        # print("bs: ", bs)
+        x = x.view(bs, nc, imgx, imgy)
+        # print("x in", x.dtype)
+        x = self.relu(self.enc_bn1(self.enc_conv1(x)))
+        x = self.relu(self.enc_bn2(self.enc_conv2(x)))
+        x = self.relu(self.enc_bn3(self.enc_conv3(x)))
+        x = self.relu(self.enc_bn4(self.enc_conv4(x)))
+        x = self.relu(self.enc_bn5(self.enc_conv5(x)))
+
+        x = x.view(bs, -1)
+        # print(x.shape)
+        x = self.relu(self.lin1(x))
+        x = self.lin3(x)
+
+        x = x.view(bs, nc, imgx, imgy)
+
+        # Apply smoothing
+        x_smooth_x = F.conv2d(x[:, 0, :, :].squeeze().view(bs, 1, imgx, imgy), self.kernel,
+                              padding=int((self.ker_size - 1) / 2), ).view(bs, 1, imgx, imgy)
+
+        x_smooth_y = F.conv2d(x[:, 1, :, :].squeeze().view(bs, 1, imgx, imgy), self.kernel,
+                              padding=int((self.ker_size - 1) / 2)).view(bs, 1, imgx, imgy)
+
+        x_smooth = torch.cat([x_smooth_x, x_smooth_y], 1)
+
+        return x_smooth_x
 
