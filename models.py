@@ -444,7 +444,7 @@ class NOAAConvGaussianNorm(ODEF):
         self.relu = nn.Tanh()
 
         # Create gaussian kernels
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
         self.ker_size = 5
         self.sigma = 0.1
         self.kernel = Variable(Tensor(self.gkern(self.ker_size, self.sigma))).view(1, 1, self.ker_size,

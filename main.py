@@ -11,36 +11,34 @@ if __name__ == '__main__':
     """
     downsize_ratio = 2
     dg_data = np.load("Data/Processed/dg_flow_field.npy")[:, :, ::downsize_ratio, ::downsize_ratio][:, :, :50, :50]
-    vortex_square_data = np.load("Data/Processed/vortex_re200_with_turbulence.npy")[:, :, :30, :30]
-    noaa_data = np.load("Data/Processed/noaa_flow_field.npy")
-    chaotic_data_80by80 = np.load("Data/Processed/chaotic_80by80.npy").reshape([2000, 1, 80, 80])
-    chaotic_data_40by40 = np.load("Data/Processed/chaotic_40by40.npy").reshape([4000, 1, 40, 40])
-    gaussian_data = np.load("Data/Processed/gaussian1.npy").reshape([-1, 1, 30, 30])
+    vortex_square_data = np.load("Data/Processed/vortex_re200_with_turbulence_flow_field.npy")[:, :, :30, :30]
+    noaa_data = np.load("Data/Processed/noaa_flow_field_standard_scaled.npy")
+    chaotic_data_40by40 = np.load("Data/Processed/chaotic_40by40_vorticity_standard_scaled.npy").reshape([4000, 1, 40, 40])
 
-    training_data = chaotic_data_40by40
+    training_data = noaa_data
     all_len, nc, x_size, y_size = training_data.shape
     print("All data shape is: ", training_data.shape)
 
     """
     Training parameters
     """
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
     ode_solve = Euler
     step_size = 0.01
     loss_arr = []  # initializing loss array
     # initialize NODE model
-    ode_train = NeuralODE(ChaoticGaussian40by40Norm2().to(device), ode_solve, step_size).double().to(device)
+    ode_train = NeuralODE(NOAAConvGaussianNorm().to(device), ode_solve, step_size).double().to(device)
     # ode_train = torch.load("SavedModels/vortex_conv_gaussian_noTurb.pth")['ode_train']
     n_grid = x_size * y_size  # grid size
-    epochs = 10000
+    epochs = 2500
     lookahead = 2
     iter_offset = 0
     lr = 0.001
-    save_path = "SavedModels/chaotic_conv_gaussian_40by40_normed_noise0_001_4000epochs_model2_1200trainlen"  # file extension will be added in training loop
-    train_start_idx = 200  # the index from which training data takes from all data
-    train_len = 1100  # length of training data
+    save_path = "SavedModels/noaa_noise0_001_2500epochs_0_to_100train_standard_scaled_data"  # file extension will be added in training loop
+    train_start_idx = 0  # the index from which training data takes from all data
+    train_len = 100  # length of training data
     step_skip = 6  # number of steps per time interval
-    batch_downsize = 7
+    batch_downsize = 1 # 7 for chaotic data
     obs = torch.tensor(training_data[train_start_idx:train_start_idx + train_len]).view(train_len, nc, x_size,
                                                                                         y_size).double().to(device)
     obs_t = step_skip * torch.tensor((np.arange(len(obs))).astype(int))
