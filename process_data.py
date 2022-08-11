@@ -26,27 +26,27 @@ if __name__ == '__main__':
     # """
     # Loading pre-processed training data from npy
     # """
-    # vortex_noTurb = np.load("Data/Processed/vortex_re200_no_turbulence.npy")
+    # vortex_noTurb = np.load("Data/TrainingDataProcessed/vortex_re200_no_turbulence.npy")
     # vortex_V_x = vortex_noTurb[:, 0, :, :].reshape(383, -1)
     # vortex_V_y = vortex_noTurb[:, 1, :, :].reshape(383, -1)
-    # vortex_withTurb = np.load("Data/Processed/vortex_re200_with_turbulence.npy")
+    # vortex_withTurb = np.load("Data/TrainingDataProcessed/vortex_re200_with_turbulence.npy")
     # vortex_V_x2 = vortex_withTurb[:, 0, :, :].reshape(383, -1)
     # vortex_V_y2 = vortex_withTurb[:, 1, :, :].reshape(383, -1)
     # diff = vortex_V_x - vortex_V_x2
-    vortex_grid = np.load("Data/Processed/vortex_grid.npy")
+    vortex_grid = np.load("Data/TrainingDataProcessed/vortex_grid.npy")
     vortex_X = vortex_grid[0, :, :].reshape(-1)
     vortex_Y = vortex_grid[1, :, :].reshape(-1)
     #
     # mag = np.sqrt(vortex_V_x2**2 + vortex_V_y2**2)
     #
     # Double Gyre
-    dg_flow_field = np.load("Data/Processed/dg_flow_field.npy")
+    dg_flow_field = np.load("Data/TrainingDataProcessed/dg_flow_field.npy")
     dg_flow_field = dg_flow_field[:, :, ::2, ::2]
     #print(dg_flow_field.shape)
     dg_U = dg_flow_field[:, 0, :50, :50].reshape(200, -1)
     dg_V = dg_flow_field[:, 1, :50, :50].reshape(200, -1)
     #print(dg_U.shape)
-    dg_grid = np.load("Data/Processed/dg_grid.npy")
+    dg_grid = np.load("Data/TrainingDataProcessed/dg_grid.npy")
     dg_grid = dg_grid[:, ::2, ::2]
     #print(dg_grid.shape)
     dg_X = dg_grid[0, :50, :50].reshape(-1)
@@ -55,18 +55,18 @@ if __name__ == '__main__':
 
 
     # NOAA Ocean data
-    noaa_flow_field = np.load("Data/Processed/noaa_flow_field.npy")[:200]
+    noaa_flow_field = np.load("Data/TrainingDataProcessed/noaa_flow_field.npy")[:200]
     print("noaa field shape is ", noaa_flow_field.shape)
     noaa_len = len(noaa_flow_field)
     noaa_U = noaa_flow_field[:, 0, :, :].reshape(noaa_len, -1)
     noaa_V = noaa_flow_field[:, 1, :, :].reshape(noaa_len, -1)
-    noaa_grid = np.load("Data/Processed/noaa_grid.npy")
+    noaa_grid = np.load("Data/TrainingDataProcessed/noaa_grid.npy")
     noaa_X = noaa_grid[0, :, :].reshape(-1)
     noaa_Y = noaa_grid[1, :, :].reshape(-1)
     print(noaa_X.shape)
 
-    chaotic_vorticity = np.load("Data/Processed/chaotic_40by40_vorticity_standard_scaled.npy")
-    chaotic_grid = np.load("Data/Processed/chaotic_40by40_grid.npy")
+    chaotic_vorticity = np.load("Data/TrainingDataProcessed/chaotic_40by40_vorticity_standard_scaled.npy")
+    chaotic_grid = np.load("Data/TrainingDataProcessed/chaotic_40by40_grid.npy")
     chaotic_X, chaotic_Y = chaotic_grid[0, :], chaotic_grid[1, :]
 
 
@@ -87,11 +87,11 @@ if __name__ == '__main__':
     # # save training data
     # regularized_grid = np.stack([X_reg, Y_reg])
     # print("grid shape: ", regularized_grid.shape)
-    # with open("Data/Processed/vortex_regularized_grid.npy", 'wb') as f:
+    # with open("Data/TrainingDataProcessed/vortex_regularized_grid.npy", 'wb') as f:
     #     np.save(f, regularized_grid)
     # training_data = np.stack([V_x_reg, V_y_reg], 1)
-    # with open("Data/Processed/vortex_re200_oscillating.npy", 'wb') as f:
+    # with open("Data/TrainingDataProcessed/vortex_re200_oscillating.npy", 'wb') as f:
     #     np.save(f, training_data)
 
-    # with open("Data/Processed/training_mag_withTurb.npy", 'wb') as f:
+    # with open("Data/TrainingDataProcessed/training_mag_withTurb.npy", 'wb') as f:
     #      np.save(f, mag.reshape(383, 50, 30))

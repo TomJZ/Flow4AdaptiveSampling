@@ -73,6 +73,7 @@ def plot_vortex(X, Y, V, tn, save=None, scatter_coor=None):
 
 
 def make_flow_anim(X, Y, V, t0, tN, save_path='', title=''):
+    print("Animating...")
     fig = plt.figure(figsize=(7, 3.7))
     ax = fig.add_subplot(1, 1, 1)
     ax.set_facecolor('black')
@@ -85,12 +86,12 @@ def make_flow_anim(X, Y, V, t0, tN, save_path='', title=''):
     fig.tight_layout()
     rcParams['animation.embed_limit'] = 2 ** 128
     img_list = []
-
+    print("[WARNING] Nan will be filled with 0's")
     for i in range(t0, tN, 1):
-        if i % 10 == 0:
+        if i % 20 == 0:
             print("Animating frame: ", i)
-        print("inf check ", np.where(np.isinf(V[i])==True))
-        print("nan check ", np.where(np.isnan(V[i]) == True))
+        # print("inf check ", np.where(np.isinf(V[i])==True))
+        # print("nan check ", np.where(np.isnan(V[i]) == True))
         V[i][np.where(np.isnan(V[i]) == True)] = 0
         c = ax.tricontourf(X[:], Y[:], V[i], levels=n_levels, cmap="RdBu_r")
         img_list.append(c.collections)

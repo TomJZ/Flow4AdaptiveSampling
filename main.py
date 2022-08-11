@@ -10,12 +10,12 @@ if __name__ == '__main__':
     Load Training Data
     """
     downsize_ratio = 2
-    dg_data = np.load("Data/Processed/dg_flow_field.npy")[:, :, ::downsize_ratio, ::downsize_ratio][:, :, :50, :50]
-    vortex_square_data = np.load("Data/Processed/vortex_re200_with_turbulence.npy")[:, :, :30, :30]
-    noaa_data = np.load("Data/Processed/noaa_flow_field.npy")
-    chaotic_data_80by80 = np.load("Data/Processed/chaotic_80by80.npy").reshape([2000, 1, 80, 80])
-    chaotic_data_40by40 = np.load("Data/Processed/chaotic_40by40.npy").reshape([4000, 1, 40, 40])
-    gaussian_data = np.load("Data/Processed/gaussian1.npy").reshape([-1, 1, 30, 30])
+    dg_data = np.load("Data/TrainingDataProcessed/dg_flow_field.npy")[:, :, ::downsize_ratio, ::downsize_ratio][:, :, :50, :50]
+    vortex_square_data = np.load("Data/TrainingDataProcessed/vortex_re200_with_turbulence.npy")[:, :, :30, :30]
+    noaa_data = np.load("Data/TrainingDataProcessed/noaa_flow_field.npy")
+    chaotic_data_80by80 = np.load("Data/TrainingDataProcessed/chaotic_80by80.npy").reshape([2000, 1, 80, 80])
+    chaotic_data_40by40 = np.load("Data/TrainingDataProcessed/chaotic_40by40.npy").reshape([4000, 1, 40, 40])
+    gaussian_data = np.load("Data/TrainingDataProcessed/gaussian1.npy").reshape([-1, 1, 30, 30])
 
     training_data = chaotic_data_40by40
     all_len, nc, x_size, y_size = training_data.shape
