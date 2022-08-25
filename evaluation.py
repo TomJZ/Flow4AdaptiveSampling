@@ -6,10 +6,10 @@ from NODE.NODE import *
 if __name__ == "__main__":
     flow = 'chaotic'  # 'dg' for double gyre, 'vortex' for vortex shedding, 'noaa' for ocean data, 'chaotic' for forced turbulence, 'gaussian' for gaussian blobs
     model_path = "SavedModels/chaotic_40by40_noise0_001_10000epochs_model2_1100trainlen_standard_scaled_data.pth"
-    training_data_path = "Data/TrainingDataProcessed/chaotic_40by40_vorticity_standard_scaled.npy"
+    training_data_path = "Data/Processed/chaotic_40by40_vorticity_standard_scaled.npy"
     init_con_snapshot = 1400
 
-    grid_path = "Data/TrainingDataProcessed/chaotic_40by40_grid.npy"
+    grid_path = "Data/Processed/chaotic_40by40_grid.npy"
     test_len = 20  # length of prediction to generate
     step_skip = 6  # number of steps within one time interval
     anim_save_path = "Data/Video/chaotic_40by40_short_pred_" + str(init_con_snapshot) + \

@@ -2,6 +2,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib import ticker
 import numpy as np
+import os
 from matplotlib import animation, rcParams
 
 
@@ -85,6 +86,7 @@ def make_flow_anim(X, Y, V, t0, tN, save_path='', title=''):
     # ax.set(xlim=(-1.5, 17.5), ylim=(-4.5, 4.5))
     fig.tight_layout()
     rcParams['animation.embed_limit'] = 2 ** 128
+    rcParams['animation.ffmpeg_path'] = 'C:/ffmpeg/bin/ffmpeg'
     img_list = []
     print("[WARNING] Nan will be filled with 0's")
     for i in range(t0, tN, 1):
@@ -99,7 +101,8 @@ def make_flow_anim(X, Y, V, t0, tN, save_path='', title=''):
     anim = animation.ArtistAnimation(fig, img_list, interval=50)
 
     if save_path is not None:
-        anim.save(save_path + '.mp4', writer=animation.FFMpegWriter(fps=12))
+        save_path_full = save_path + '.mp4'
+        anim.save(save_path_full, writer=animation.FFMpegWriter(fps=12))
 
     return anim
 

@@ -920,5 +920,5 @@ class ChaoticFlowField40by40Norm(ODEF):
 
         x_smooth = torch.cat([x_smooth_x, x_smooth_y], 1)
 
-        return x_smooth_x
+        return x_smooth
 
