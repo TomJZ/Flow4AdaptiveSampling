@@ -919,6 +919,55 @@ class ChaoticFlowField40by40Norm(ODEF):
                               padding=int((self.ker_size - 1) / 2)).view(bs, 1, imgx, imgy)
 
         x_smooth = torch.cat([x_smooth_x, x_smooth_y], 1)
+        return x_smooth
 
-        return x_smooth_x
+class ChaoticVorticity40by40Norm_noGaussian(ODEF):
+    # for size 40 by 40
+    def __init__(self):
+        super(ChaoticVorticity40by40Norm_noGaussian, self).__init__()
+        bias = True
+        self.enc_conv1 = nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=0, bias=bias)
+        self.enc_conv2 = nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=0, bias=bias)
+        self.enc_conv3 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1, bias=bias)
+        self.enc_conv4 = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1, bias=bias)
+        self.enc_conv5 = nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=0, bias=bias)
+        self.enc_conv6 = nn.Conv2d(128, 64, kernel_size=3, stride=2, padding=0, bias=bias)
+        self.enc_conv7 = nn.Conv2d(64, 16, kernel_size=3, stride=2, padding=0, bias=bias)
+
+        self.enc_bn1 = nn.BatchNorm2d(32)
+        self.enc_bn2 = nn.BatchNorm2d(32)
+        self.enc_bn3 = nn.BatchNorm2d(64)
+        self.enc_bn4 = nn.BatchNorm2d(128)
+        self.enc_bn5 = nn.BatchNorm2d(128)
+        self.enc_bn6 = nn.BatchNorm2d(64)
+        self.enc_bn7 = nn.BatchNorm2d(16)
+
+        self.lin1 = nn.Linear(784, 512, bias=bias)
+        self.lin3 = nn.Linear(512, 40 * 40, bias=bias)
+
+        self.relu = nn.Tanh()
+
+        # Create gaussian kernels
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+    def forward(self, x):
+        bs, nc, imgx, imgy = x.shape
+        # print("bs: ", bs)
+        x = x.view(bs, nc, imgx, imgy)
+        # print("x in", x.dtype)
+        x = self.relu(self.enc_bn1(self.enc_conv1(x)))
+        x = self.relu(self.enc_bn2(self.enc_conv2(x)))
+        x = self.relu(self.enc_bn3(self.enc_conv3(x)))
+        x = self.relu(self.enc_bn4(self.enc_conv4(x)))
+        x = self.relu(self.enc_bn5(self.enc_conv5(x)))
+        x = self.relu(self.enc_bn6(self.enc_conv6(x)))
+        x = self.relu(self.enc_bn7(self.enc_conv7(x)))
+
+        x = x.view(bs, -1)
+        x = self.relu(self.lin1(x))
+        x = self.lin3(x)
+
+        x = x.view(bs, nc, imgx, imgy)
+
+        return x
 
