@@ -20,17 +20,17 @@ def normalize_data(X_train,scaler="minmax"):
 
 
 if __name__ == "__main__":
-    data = np.load("../Data/Processed/chaotic_40by40_flow_field.npy")
+    data = np.load("../Data/TrainingDataProcessed/chaotic_40by40_flow_field.npy")
     data = normalize_data(data, "standard")
-    with open("../Data/Processed/chaotic_40by40_flow_field_standard_scaled.npy", "wb") as f:
+    with open("../Data/TrainingDataProcessed/chaotic_40by40_flow_field_standard_scaled.npy", "wb") as f:
         np.save(f, data)
 
-    # data = np.load("../Data/Processed/chaotic_40by40_vorticity.npy")
+    # data = np.load("../Data/TrainingDataProcessed/chaotic_40by40_vorticity.npy")
     # data = normalize_data(data, "standard")
-    # with open("../Data/Processed/chaotic_40by40_vorticity_standard_scaled.npy", "wb") as f:
+    # with open("../Data/TrainingDataProcessed/chaotic_40by40_vorticity_standard_scaled.npy", "wb") as f:
     #     np.save(f, data)
     #
-    # data = np.load("../Data/Processed/noaa_flow_field.npy")
+    # data = np.load("../Data/TrainingDataProcessed/noaa_flow_field.npy")
     # data = normalize_data(data, "standard")
-    # with open("../Data/Processed/noaa_flow_field_standard_scaled.npy", "wb") as f:
+    # with open("../Data/TrainingDataProcessed/noaa_flow_field_standard_scaled.npy", "wb") as f:
     #     np.save(f, data)
