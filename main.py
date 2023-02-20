@@ -29,18 +29,19 @@ if __name__ == '__main__':
     step_size = 0.01
     loss_arr = []  # initializing loss array
     # initialize NODE model
-    ode_train = NeuralODE(ChaoticGaussian40by40Norm2().to(device), ode_solve, step_size).double().to(device)
+    ode_train = NeuralODE(ChaoticVorticity40by40Norm_noGaussian().to(device), ode_solve, step_size).double().to(device)
     # ode_train = torch.load("SavedModels/vortex_conv_gaussian_noTurb.pth")['ode_train']
     n_grid = x_size * y_size  # grid size
-    epochs = 10000
+    epochs = 20000
     lookahead = 2
     iter_offset = 0
     lr = 0.001
-    save_path = "SavedModels/chaotic_conv_gaussian_40by40_normed_noise0_001_4000epochs_model2_1200trainlen"  # file extension will be added in training loop
+    save_path = "SavedModels/chaotic_vorticity_noise0_001_20000epochs_2000trainlen_nogaussian_standard_scaled_data"  # file extension will be added in training loop
+
     train_start_idx = 200  # the index from which training data takes from all data
-    train_len = 1100  # length of training data
+    train_len = 2000  # length of training data
     step_skip = 6  # number of steps per time interval
-    batch_downsize = 7
+    batch_downsize = 19 # 7 for chaotic data
     obs = torch.tensor(training_data[train_start_idx:train_start_idx + train_len]).view(train_len, nc, x_size,
                                                                                         y_size).double().to(device)
     obs_t = step_skip * torch.tensor((np.arange(len(obs))).astype(int))
