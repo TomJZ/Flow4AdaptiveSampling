@@ -5,7 +5,7 @@ from NODE.NODE import *
 
 if __name__ == "__main__":
     flow = 'chaotic'  # 'dg' for double gyre, 'vortex' for vortex shedding, 'noaa' for ocean data, 'chaotic' for forced turbulence, 'gaussian' for gaussian blobs
-    model_path = "SavedModels/chaotic_40by40_noise0_001_10000epochs_model2_1100trainlen_standard_scaled_data.pth"
+    model_path = "SavedModels/chaotic_vorticity_noise0_0001_20000epochs_3000trainlen_nogaussian_standard_scaled_data.pth"
     training_data_path = "Data/Processed/chaotic_40by40_vorticity_standard_scaled.npy"
     init_con_snapshot = 1400
 
