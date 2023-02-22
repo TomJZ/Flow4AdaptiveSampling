@@ -4,19 +4,19 @@ from Utils.POD import *
 from NODE.NODE import *
 
 if __name__ == "__main__":
-    flow = 'chaotic'  # 'dg' for double gyre, 'vortex' for vortex shedding, 'noaa' for ocean data, 'chaotic' for forced turbulence, 'gaussian' for gaussian blobs
-    model_path = "SavedModels/chaotic_vorticity_noise0_0001_20000epochs_3000trainlen_nogaussian_standard_scaled_data.pth"
-    training_data_path = "Data/Processed/chaotic_40by40_vorticity_standard_scaled.npy"
-    init_con_snapshot = 1400
+    flow = 'noaa'  # 'dg' for double gyre, 'vortex' for vortex shedding, 'noaa' for ocean data, 'chaotic' for forced turbulence, 'gaussian' for gaussian blobs
+    model_path = "SavedModels/noaa_50by30_noise0_001_2041epochs_400trainlen_gaussian_standard_scaled_data.pth"
+    training_data_path = "Data/TrainingDataProcessed/noaa_50by30_flow_field_standard_scaled.npy"
+    init_con_snapshot = 0
 
-    grid_path = "Data/Processed/chaotic_40by40_grid.npy"
-    test_len = 20  # length of prediction to generate
+    grid_path = "Data/TrainingDataProcessed/vortex_grid.npy"
+    test_len = 300  # length of prediction to generate
     step_skip = 6  # number of steps within one time interval
-    anim_save_path = "Data/Video/chaotic_40by40_short_pred_" + str(init_con_snapshot) + \
+    anim_save_path = "Data/Video/noaa_50by30_2041_trained_pred_" + str(init_con_snapshot) + \
                      "to" + str(init_con_snapshot+test_len)
-    anim_title = "training prediction chaotic vorticity"
-    pred_save_path = "Data/Predictions/chaotic_1100_to_1500_using_chaotic_40by40_noise0_001_10000epochs_model2_1100trainlen_standard_scaled_data.npy"
-    square = True  # if only looks at the square area in vortex shedding
+    anim_title = "training prediction noaa"
+    pred_save_path = "Data/Predictions/chaotic_1100_to_1500_using_chaotic_40by40_noise0_001_2041epochs_model2_1100trainlen_standard_scaled_data.npy"
+    square = False  # if only looks at the square area in vortex shedding
     generate_animation = True  # whether to generate animation and save
     generate_POD = False  # whether to compute POD energies
     save_prediction = False  # whether to save predicted trajectories
@@ -32,20 +32,22 @@ if __name__ == "__main__":
     load pretrained model
     """
     ode_train = torch.load(model_path, map_location=torch.device('cpu'))['ode_train']
+    ode_train = ode_train.to(torch.double)
 
     """
     Load initial condition from data 
     """
-    processed_data = np.load(training_data_path).reshape([-1, 1, 40, 40])[:, :, ::data_shrink_scale, ::data_shrink_scale]
+    # must change reshape dimension
+    processed_data = np.load(training_data_path).reshape([-1, 2, 50, 30])[:, :, ::data_shrink_scale, ::data_shrink_scale]
     grid = np.load(grid_path)[:, ::data_shrink_scale, ::data_shrink_scale]
     if flow == 'dg':
         # cropping double gyre to a square
         processed_data = processed_data[:, :, :50, :50]
         grid = grid[:, :50, :50]
-    elif flow == 'noaa' or flow == 'chaotic' or flow == 'gaussian':
+    elif flow == 'chaotic' or flow == 'gaussian':
         # noaa data is already cropped to a square
         processed_data = processed_data.astype(np.double)
-    elif flow == 'vortex':
+    elif flow == 'vortex' or flow == 'noaa':
         if square:
             processed_data = processed_data[:, :, :30, :30]
             grid = grid[:, :30, :30]
@@ -61,7 +63,7 @@ if __name__ == "__main__":
 
     start = time.time()
     # generating predictions
-    z_p = ode_train(initial_condition,
+    z_p = ode_train(initial_condition.double(),
                     step_skip * torch.tensor(np.arange(test_len).astype(int)),
                     return_whole_sequence=True)
     duration = time.time() - start

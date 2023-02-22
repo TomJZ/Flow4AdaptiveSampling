@@ -147,7 +147,7 @@ class VortexConvGaussian(ODEF):
         bs, nc, imgx, imgy = x.shape
         # print("bs: ", bs)
         x = x.view(bs, nc, imgx, imgy)
-        # print("x in", x.size())
+        #print("x in", x)
         x = self.relu(self.enc_conv1(x))
         x = self.relu(self.enc_conv2(x))
         x = self.relu(self.enc_conv3(x))
