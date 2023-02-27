@@ -4,21 +4,21 @@ from Utils.POD import *
 from NODE.NODE import *
 
 if __name__ == "__main__":
-    flow = 'noaa'  # 'dg' for double gyre, 'vortex' for vortex shedding, 'noaa' for ocean data, 'chaotic' for forced turbulence, 'gaussian' for gaussian blobs
-    model_path = "SavedModels/noaa_50by30_noise0_001_2041epochs_400trainlen_gaussian_standard_scaled_data.pth"
-    training_data_path = "Data/TrainingDataProcessed/noaa_50by30_flow_field_standard_scaled.npy"
+    flow = 'vortex'  # 'dg' for double gyre, 'vortex' for vortex shedding, 'noaa' for ocean data, 'chaotic' for forced turbulence, 'gaussian' for gaussian blobs
+    model_path = "SavedModels/vortex_conv_gaussian_square.pth"
+    training_data_path = "Data/TrainingDataProcessed/vortex_re200_withTurb_long_flow_field.npy"
     init_con_snapshot = 0
 
     grid_path = "Data/TrainingDataProcessed/vortex_grid.npy"
-    test_len = 300  # length of prediction to generate
+    test_len = 30  # length of prediction to generate
     step_skip = 6  # number of steps within one time interval
     anim_save_path = "Data/Video/noaa_50by30_2041_trained_pred_" + str(init_con_snapshot) + \
                      "to" + str(init_con_snapshot+test_len)
-    anim_title = "training prediction noaa"
+    anim_title = "training prediction vortex"
     pred_save_path = "Data/Predictions/chaotic_1100_to_1500_using_chaotic_40by40_noise0_001_2041epochs_model2_1100trainlen_standard_scaled_data.npy"
-    square = False  # if only looks at the square area in vortex shedding
-    generate_animation = True  # whether to generate animation and save
-    generate_POD = False  # whether to compute POD energies
+    square = True  # if only looks at the square area in vortex shedding
+    generate_animation = False  # whether to generate animation and save
+    generate_POD = True  # whether to compute POD energies
     save_prediction = False  # whether to save predicted trajectories
 
     if flow == 'dg':
