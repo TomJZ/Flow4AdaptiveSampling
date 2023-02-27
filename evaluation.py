@@ -7,10 +7,10 @@ if __name__ == "__main__":
     flow = 'vortex'  # 'dg' for double gyre, 'vortex' for vortex shedding, 'noaa' for ocean data, 'chaotic' for forced turbulence, 'gaussian' for gaussian blobs
     model_path = "SavedModels/vortex_conv_gaussian_sqaure.pth"
     training_data_path = "Data/TrainingDataProcessed/vortex_re200_withTurb_long_flow_field.npy"
-    init_con_snapshot = 300
+    init_con_snapshot = 0
 
     grid_path = "Data/TrainingDataProcessed/vortex_grid.npy"
-    test_len = 100  # length of prediction to generate
+    test_len = 50  # length of prediction to generate
     step_skip = 6  # number of steps within one time interval
     anim_save_path = "Data/Video/noaa_50by30_2041_trained_pred_" + str(init_con_snapshot) + \
                      "to" + str(init_con_snapshot+test_len)
@@ -33,12 +33,19 @@ if __name__ == "__main__":
     """
     ode_train = torch.load(model_path, map_location=torch.device('cpu'))['ode_train']
     ode_train = ode_train.to(torch.double)
+    loss = torch.load(model_path, map_location=torch.device('cpu'))['loss_arr']
+    print("trained for {0} epochs".format(len(loss)))
 
     """
     Load initial condition from data 
     """
     # must change reshape dimension
-    processed_data = np.load(training_data_path).reshape([-1, 2, 50, 30])[:, :, ::data_shrink_scale, ::data_shrink_scale]
+    if flow == "noaa":
+        processed_data = np.load(training_data_path).reshape([-1, 2, 30, 30])[:, :, ::data_shrink_scale,
+                         ::data_shrink_scale]
+    elif flow == "vortex":
+        processed_data = np.load(training_data_path).reshape([-1, 2, 50, 30])[:, :, ::data_shrink_scale,
+                         ::data_shrink_scale]
     grid = np.load(grid_path)[:, ::data_shrink_scale, ::data_shrink_scale]
     if flow == 'dg':
         # cropping double gyre to a square

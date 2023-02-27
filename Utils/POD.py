@@ -56,7 +56,7 @@ def calculate_POD_basis(snapshots, basis_idx=[0], verbose=True):
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
-    data = np.load("../Data/TrainingDataProcessed/vortex_re200_oscillating_long_flow_field.npy")[300:400, :30, :30]
+    data = np.load("../Data/TrainingDataProcessed/noaa_30by30_flow_field_standard_scaled.npy")[0:50, :30, :30]
     data_len = data.shape[0]
     print("data shape is: ", data.shape)
     _, energies, _, _, _ = calculate_POD_basis(data.reshape(data_len, -1), basis_idx=[0,1,2,3])
