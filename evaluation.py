@@ -5,12 +5,12 @@ from NODE.NODE import *
 
 if __name__ == "__main__":
     flow = 'vortex'  # 'dg' for double gyre, 'vortex' for vortex shedding, 'noaa' for ocean data, 'chaotic' for forced turbulence, 'gaussian' for gaussian blobs
-    model_path = "SavedModels/vortex_conv_gaussian_square.pth"
+    model_path = "SavedModels/vortex_conv_gaussian_sqaure.pth"
     training_data_path = "Data/TrainingDataProcessed/vortex_re200_withTurb_long_flow_field.npy"
-    init_con_snapshot = 0
+    init_con_snapshot = 300
 
     grid_path = "Data/TrainingDataProcessed/vortex_grid.npy"
-    test_len = 30  # length of prediction to generate
+    test_len = 100  # length of prediction to generate
     step_skip = 6  # number of steps within one time interval
     anim_save_path = "Data/Video/noaa_50by30_2041_trained_pred_" + str(init_con_snapshot) + \
                      "to" + str(init_con_snapshot+test_len)
@@ -100,6 +100,7 @@ if __name__ == "__main__":
     Generating POD basis
     """
     if generate_POD:
-        _, energies, _, _, _ = calculate_POD_basis(pred.reshape(test_len, -1))
+        print("POD data shape is: ", pred.shape)
+        _, energies, _, _, _ = calculate_POD_basis(pred.reshape(test_len, -1), basis_idx=[0,1,2,3])
         plt.scatter(np.arange(len(energies)), energies)
         plt.show()
