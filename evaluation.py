@@ -1,4 +1,7 @@
 import time
+
+import matplotlib.pyplot as plt
+import matplotlib as mpl
 from Utils.Plotters import *
 from Utils.POD import *
 from NODE.NODE import *
@@ -7,13 +10,13 @@ if __name__ == "__main__":
     flow = 'vortex'  # 'dg' for double gyre, 'vortex' for vortex shedding, 'noaa' for ocean data, 'chaotic' for forced turbulence, 'gaussian' for gaussian blobs
     model_path = "SavedModels/vortex_conv_gaussian_sqaure.pth"
     training_data_path = "Data/TrainingDataProcessed/vortex_re200_withTurb_long_flow_field.npy"
-    init_con_snapshot = 0
+    init_con_snapshot = 300
 
     grid_path = "Data/TrainingDataProcessed/vortex_grid.npy"
     test_len = 50  # length of prediction to generate
     step_skip = 6  # number of steps within one time interval
     anim_save_path = "Data/Video/noaa_50by30_2041_trained_pred_" + str(init_con_snapshot) + \
-                     "to" + str(init_con_snapshot+test_len)
+                     "to" + str(init_con_snapshot + test_len)
     anim_title = "training prediction vortex"
     pred_save_path = "Data/Predictions/chaotic_1100_to_1500_using_chaotic_40by40_noise0_001_2041epochs_model2_1100trainlen_standard_scaled_data.npy"
     square = True  # if only looks at the square area in vortex shedding
@@ -108,6 +111,8 @@ if __name__ == "__main__":
     """
     if generate_POD:
         print("POD data shape is: ", pred.shape)
-        _, energies, _, _, _ = calculate_POD_basis(pred.reshape(test_len, -1), basis_idx=[0,1,2,3])
+        _, energies, _, _, _ = calculate_POD_basis(pred.reshape(test_len, -1), basis_idx=[0, 1, 2, 3])
+        mpl.rcParams.update({'font.size': 15})
+        plt.figure(figsize=(6, 3))
         plt.scatter(np.arange(len(energies)), energies)
         plt.show()

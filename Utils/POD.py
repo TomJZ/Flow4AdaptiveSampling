@@ -1,5 +1,5 @@
 import numpy as np
-
+import matplotlib as mpl
 
 def calculate_POD_basis(snapshots, basis_idx=[0], verbose=True):
     '''
@@ -46,7 +46,7 @@ def calculate_POD_basis(snapshots, basis_idx=[0], verbose=True):
 
     if verbose:
         print('#####################\nWith {0} basis\n{1:.3f}% energy is captured\n#####################'.format(m, (
-                    sum(S[basis_idx]).real / sum(S).real) * 100))
+                sum(S[basis_idx]).real / sum(S).real) * 100))
         print('Pod Basis Shape: ', pod_basis.shape)
         print("U shape:\n", U.shape)
         print("S shape:\n", S.shape)
@@ -54,11 +54,17 @@ def calculate_POD_basis(snapshots, basis_idx=[0], verbose=True):
         print("reconstruction shape:\n", full_recon.shape)
     return U, S, V, full_recon, pod_basis
 
+
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
-    data = np.load("../Data/TrainingDataProcessed/noaa_30by30_flow_field_standard_scaled.npy")[0:50, :30, :30]
+
+    noaa_path = "../Data/TrainingDataProcessed/noaa_30by30_flow_field_standard_scaled.npy"
+    vortex_path = "../Data/TrainingDataProcessed/vortex_re200_withTurb_long_flow_field.npy"
+    data = np.load(vortex_path)[300:350, :30, :30]
     data_len = data.shape[0]
     print("data shape is: ", data.shape)
-    _, energies, _, _, _ = calculate_POD_basis(data.reshape(data_len, -1), basis_idx=[0,1,2,3])
+    _, energies, _, _, _ = calculate_POD_basis(data.reshape(data_len, -1), basis_idx=[0, 1, 2, 3])
+    mpl.rcParams.update({'font.size': 15})
+    plt.figure(figsize=(6, 3))
     plt.scatter(np.arange(len(energies)), energies)
     plt.show()
