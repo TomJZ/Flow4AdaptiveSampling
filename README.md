@@ -20,8 +20,18 @@ The ocean flow data is from National Oceanic and Atmospheric Administration [(NO
 2D flow around a cylinder. The flow is simulated by solving the Navier-Stoke equations in a 50m by 40m rectangular work space. An inflow stream with uniform velocity profile is imposed on the left boundary, with a zero pressure outflow on the right boundary. The cylinder has a 1m radius and is centered at (0, 0). The Reynolds number of the flow is 200.
 
 ## Training
-To train a flow model
+The training loop can be found in ```train.py```
+To train a flow model, modify the file ```main.py```. You need to
+* Select the training data on the line ```training_data = [data of your choice]```
+* Choose your NODE model on the line ```ode_train = NeuralODE([model of your choice])
+* Select your training parameters such as the number of epochs, learning rate, etc.
+* Specify the path to save your trained model on the line ```save_path = [path_to_save_trained-model]```
+* To train only on fully developed flows, you can truncate the data by specifying the index from which the data is used for training. This can be specified with ```train_start_idx``` ,and the length of training data used can be specified by ```train_len```
+* To start training, run:
+
 ```python3 main.py```
 
-## Evaluation
-## Inference
+## Models
+Model classes are in the file ```models.py```
+## Evaluation and Inference
+Use evaluation.py for model evaluation and inference.
